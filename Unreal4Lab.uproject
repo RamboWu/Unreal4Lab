@@ -1,0 +1,13 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{A4269BB5-40F2-8396-E107-E5B16B4AC605}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "Unreal4Lab",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
