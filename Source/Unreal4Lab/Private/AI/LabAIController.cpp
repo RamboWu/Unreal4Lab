@@ -49,7 +49,7 @@ void ALabAIController::SearchForEnemy()
 
 	const FVector my_location = my_bot->GetActorLocation();
 	float best_dist = MAX_FLT;
-	ACharacter* best_target = NULL;
+	ALabPawn* best_target = NULL;
 
 	for (FConstPawnIterator It = GetWorld()->GetPawnIterator(); It; ++It)
 	{
@@ -59,7 +59,7 @@ void ALabAIController::SearchForEnemy()
 			continue;
 		}
 
-		ACharacter* tmp_target = Cast<ACharacter>(*It);
+		ALabPawn* tmp_target = Cast<ALabPawn>(*It);
 		if (tmp_target)
 		{
 			const float dist = FVector::Dist(tmp_target->GetActorLocation(), my_location);

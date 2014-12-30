@@ -4,6 +4,7 @@
 
 #include "LabTypes.h"
 #include "LabTeamInterface.h"
+#include "LabStateInterface.h"
 #include "GameFramework/Character.h"
 #include "LabPawn.generated.h"
 
@@ -11,7 +12,7 @@
  * 
  */
 UCLASS()
-class UNREAL4LAB_API ALabPawn : public ACharacter, public ILabTeamInterface
+class UNREAL4LAB_API ALabPawn : public ACharacter, public ILabTeamInterface, public ILabStateInterface
 {
 	GENERATED_UCLASS_BODY()
 
