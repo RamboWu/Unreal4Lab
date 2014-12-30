@@ -36,3 +36,8 @@ uint32 ILabStateInterface::GetMaxHealth()
 {
 	return 0;
 }
+
+uint32 ILabStateInterface::GetAttackRange() const
+{
+	return 0;
+}

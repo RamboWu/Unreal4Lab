@@ -5,7 +5,7 @@
 
 
 ALabPawn::ALabPawn(const class FPostConstructInitializeProperties& PCIP)
-	: Super(PCIP)
+	: Super(PCIP), m_base_health(100), m_health(100), m_base_attack_range(300)
 {
 	bReplicates = true;
 }
@@ -13,6 +13,7 @@ ALabPawn::ALabPawn(const class FPostConstructInitializeProperties& PCIP)
 void ALabPawn::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	DOREPLIFETIME(ALabPawn, m_team_num);
+	DOREPLIFETIME(ALabPawn, m_health);
 }
 
 uint8 ALabPawn::GetTeamNum() const
@@ -38,4 +39,23 @@ float ALabPawn::GetHealthPercentage()
 uint32 ALabPawn::GetMaxHealth()
 {
 	return m_base_health;
+}
+
+uint32 ALabPawn::GetAttackRange() const
+{
+	return m_base_attack_range;
+}
+
+void ALabPawn::Client_PlayMeleeAnim()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "PlayAnimMontage, health:" + FString::FromInt(m_health));
+	if ((m_health > 0.f) && MeleeAnim)
+	{
+		
+		float duration = PlayAnimMontage(MeleeAnim);
+
+		
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "PlayAnimMontage" + FString::SanitizeFloat(duration));
+		
+	}
 }

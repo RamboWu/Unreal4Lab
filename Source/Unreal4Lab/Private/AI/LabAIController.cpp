@@ -9,7 +9,9 @@
 
 
 ALabAIController::ALabAIController(const class FPostConstructInitializeProperties& PCIP)
-	: Super(PCIP)
+	: Super(PCIP), 
+	MeleeAttackAnimationEndTime(0),
+	bIsPlayingAnimation(false)
 {
 	BlackboardComp = PCIP.CreateDefaultSubobject<UBlackboardComponent>(this, TEXT("BlackboardComp"));
 
@@ -77,3 +79,40 @@ void ALabAIController::SearchForEnemy()
 }
 
 
+
+bool ALabAIController::withInAttackRange()
+{
+	APawn* enemey = Cast<APawn>(BlackboardComp->GetValueAsObject(EnemyKeyID));
+	ALabPawn* self_pawn = Cast<ALabPawn>(GetPawn());
+	if (enemey && self_pawn)
+	{
+		FVector length_vec = enemey->GetActorLocation() - self_pawn->GetActorLocation();
+		float dist = length_vec.Size();
+		if (dist <= self_pawn->GetAttackRange())
+		{
+			return true;
+		}
+		else
+			return false;
+
+	}
+	else
+		return false;
+}
+
+void ALabAIController::Attack()
+{
+	ALabPawn* self_pawn = Cast<ALabPawn>(GetPawn());
+
+	bIsPlayingAnimation = GetWorld()->GetTimeSeconds() < MeleeAttackAnimationEndTime;
+
+	
+
+	if (self_pawn && !bIsPlayingAnimation)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Client_PlayMeleeAnim");
+		self_pawn->Client_PlayMeleeAnim();
+		MeleeAttackAnimationEndTime = GetWorld()->GetTimeSeconds() + 1.f;
+		bIsPlayingAnimation = true;
+	}
+}

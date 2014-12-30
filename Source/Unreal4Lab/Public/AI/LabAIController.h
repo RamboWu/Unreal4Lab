@@ -27,9 +27,19 @@ class UNREAL4LAB_API ALabAIController : public AAIController
 	UFUNCTION(BlueprintCallable, Category = Behavior)
 	void SearchForEnemy();
 
+	UFUNCTION(BlueprintCallable, Category = Behavior)
+	bool withInAttackRange();
+
+	UFUNCTION(BlueprintCallable, Category = Behavior)
+	void Attack();
+
 protected:
 	uint8 EnemyKeyID;
 	uint8 EnemyLocationID;
 
+	/** time when we will finish playing melee animation */
+	float MeleeAttackAnimationEndTime;
 
+	/** if pawn is playing attack animation */
+	uint32 bIsPlayingAnimation : 1;
 };

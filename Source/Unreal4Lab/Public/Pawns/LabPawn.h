@@ -25,15 +25,30 @@ class UNREAL4LAB_API ALabPawn : public ACharacter, public ILabTeamInterface, pub
 	virtual float GetHealthPercentage() override;
 
 	virtual uint32 GetMaxHealth() override;
-	/*ILabStateInterface end*/
 
+	UFUNCTION(BlueprintCallable, Category = State)
+	virtual uint32 GetAttackRange() const override;
+	/*ILabStateInterface end*/
 
 	/** set team number */
 	void SetTeamNum(uint8 NewTeamNum);
 
 
 
+
+	UFUNCTION()
+	void Client_PlayMeleeAnim();
+
+
 protected:
+	/** melee anim */
+	UPROPERTY(EditDefaultsOnly, Category = Pawn)
+	UAnimMontage* MeleeAnim;
+
+	/** death anim */
+	UPROPERTY(EditDefaultsOnly, Category = Pawn)
+	UAnimMontage* DeathAnim;
+
 	/*team num*/
 	UPROPERTY(EditAnywhere, Replicated,  Category = State)
 	TEnumAsByte<ELabTeam::Type> m_team_num;
@@ -42,6 +57,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = State)
 	uint32 m_base_health;
 
-	UPROPERTY(BlueprintReadOnly, Replicated, Category = State)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = State)
 	uint32 m_health;
+
+	/*base attack range*/
+	UPROPERTY(EditAnywhere, Category = State)
+	uint32 m_base_attack_range;
 };
