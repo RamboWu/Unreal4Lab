@@ -19,6 +19,8 @@ class ILabStateInterface
 
 	virtual float GetHealthPercentage();
 
+	virtual uint32 GetMaxHealth();
+
 	virtual bool HasMana();
 
 	virtual uint32 getMana();

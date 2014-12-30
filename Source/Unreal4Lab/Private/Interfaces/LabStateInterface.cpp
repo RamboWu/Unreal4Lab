@@ -31,3 +31,8 @@ float ILabStateInterface::GetManaPercentage()
 {
 	return 0.f;
 }
+
+uint32 ILabStateInterface::GetMaxHealth()
+{
+	return 0;
+}
