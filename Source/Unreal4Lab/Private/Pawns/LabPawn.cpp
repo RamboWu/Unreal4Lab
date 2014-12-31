@@ -5,7 +5,7 @@
 
 
 ALabPawn::ALabPawn(const class FPostConstructInitializeProperties& PCIP)
-	: Super(PCIP), m_base_health(100), m_health(100), m_base_attack_range(300)
+	: Super(PCIP), m_base_health(100), m_health(100), m_base_attack_range(100), m_base_sight_distance(300)
 {
 	bReplicates = true;
 }
@@ -48,14 +48,16 @@ uint32 ALabPawn::GetAttackRange() const
 
 void ALabPawn::Client_PlayMeleeAnim()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "PlayAnimMontage, health:" + FString::FromInt(m_health));
+
 	if ((m_health > 0.f) && MeleeAnim)
 	{
 		
 		float duration = PlayAnimMontage(MeleeAnim);
 
-		
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "PlayAnimMontage" + FString::SanitizeFloat(duration));
-		
 	}
+}
+
+uint32 ALabPawn::GetSightDistance()
+{
+	return m_base_sight_distance;
 }

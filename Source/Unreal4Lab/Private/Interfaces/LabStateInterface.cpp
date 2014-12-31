@@ -41,3 +41,8 @@ uint32 ILabStateInterface::GetAttackRange() const
 {
 	return 0;
 }
+
+uint32 ILabStateInterface::GetSightDistance()
+{
+	return 0;
+}

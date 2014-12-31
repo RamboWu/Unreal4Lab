@@ -11,7 +11,8 @@
 ALabAIController::ALabAIController(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP), 
 	MeleeAttackAnimationEndTime(0),
-	bIsPlayingAnimation(false)
+	bIsPlayingAnimation(false), 
+	bMovingToTarget(false)
 {
 	BlackboardComp = PCIP.CreateDefaultSubobject<UBlackboardComponent>(this, TEXT("BlackboardComp"));
 
@@ -103,16 +104,60 @@ bool ALabAIController::withInAttackRange()
 void ALabAIController::Attack()
 {
 	ALabPawn* self_pawn = Cast<ALabPawn>(GetPawn());
+	APawn* enemey = Cast<APawn>(BlackboardComp->GetValueAsObject(EnemyKeyID));
 
 	bIsPlayingAnimation = GetWorld()->GetTimeSeconds() < MeleeAttackAnimationEndTime;
 
-	
 
-	if (self_pawn && !bIsPlayingAnimation)
+	if (self_pawn && !bIsPlayingAnimation && enemey)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Client_PlayMeleeAnim");
-		self_pawn->Client_PlayMeleeAnim();
-		MeleeAttackAnimationEndTime = GetWorld()->GetTimeSeconds() + 1.f;
-		bIsPlayingAnimation = true;
+
+		// try move closer if needed again
+		MoveCloser();
+
+		if (!bMovingToTarget)
+		{
+			self_pawn->Client_PlayMeleeAnim();
+			MeleeAttackAnimationEndTime = GetWorld()->GetTimeSeconds() + 1.f;
+			bIsPlayingAnimation = true;
+		}
+
+	}
+}
+
+void ALabAIController::MoveCloser()
+{
+
+	if (bIsPlayingAnimation || bMovingToTarget)
+	{
+		return;
+	}
+
+	APawn* enemey = Cast<APawn>(BlackboardComp->GetValueAsObject(EnemyKeyID));
+	ALabPawn* self_pawn = Cast<ALabPawn>(GetPawn());
+	if (enemey && self_pawn)
+	{
+		const float AttackDistance = self_pawn->GetAttackRange();
+		FVector length_vec = enemey->GetActorLocation() - self_pawn->GetActorLocation();
+		float dist = length_vec.Size();
+
+		if (dist > AttackDistance)
+		{
+			bMovingToTarget = true;
+			MoveToActor(enemey, 0.9 * AttackDistance);	
+		}
+	}
+
+}
+
+void ALabAIController::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
+{
+	if (Result != EPathFollowingResult::Skipped)
+	{
+		bMovingToTarget = false;
+		if (PathFollowingComponent.IsValid())
+		{
+			PathFollowingComponent->AbortMove(TEXT("close enought"));
+		}
 	}
 }

@@ -22,7 +22,7 @@ class UNREAL4LAB_API ALabAIController : public AAIController
 
 	virtual void Possess(class APawn *InPawn) override;
 
-	void SetEnemy(class APawn *InPawn);
+
 
 	UFUNCTION(BlueprintCallable, Category = Behavior)
 	void SearchForEnemy();
@@ -33,7 +33,17 @@ class UNREAL4LAB_API ALabAIController : public AAIController
 	UFUNCTION(BlueprintCallable, Category = Behavior)
 	void Attack();
 
+	// Begin AIController Interface
+	virtual void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result) override;
+	// End AIController Interface
+
 protected:
+
+	void SetEnemy(class APawn *InPawn);
+
+	/** move closer to target */
+	void MoveCloser();
+
 	uint8 EnemyKeyID;
 	uint8 EnemyLocationID;
 
@@ -42,4 +52,8 @@ protected:
 
 	/** if pawn is playing attack animation */
 	uint32 bIsPlayingAnimation : 1;
+
+	/** set to true when we are moving to our target */
+	uint32 bMovingToTarget : 1;
+
 };

@@ -28,4 +28,6 @@ class ILabStateInterface
 	virtual float GetManaPercentage();
 
 	virtual uint32 GetAttackRange() const;
+
+	virtual uint32 GetSightDistance();
 };

@@ -28,6 +28,8 @@ class UNREAL4LAB_API ALabPawn : public ACharacter, public ILabTeamInterface, pub
 
 	UFUNCTION(BlueprintCallable, Category = State)
 	virtual uint32 GetAttackRange() const override;
+
+	virtual uint32 GetSightDistance() override;
 	/*ILabStateInterface end*/
 
 	/** set team number */
@@ -38,6 +40,8 @@ class UNREAL4LAB_API ALabPawn : public ACharacter, public ILabTeamInterface, pub
 
 	UFUNCTION()
 	void Client_PlayMeleeAnim();
+
+
 
 
 protected:
@@ -63,4 +67,7 @@ protected:
 	/*base attack range*/
 	UPROPERTY(EditAnywhere, Category = State)
 	uint32 m_base_attack_range;
+
+	UPROPERTY(EditAnywhere, Category = State)
+	uint32 m_base_sight_distance;
 };
