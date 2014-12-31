@@ -29,6 +29,16 @@ protected:
 	/** Input handlers for SetDestination action. */
 	void OnSetDestinationPressed();
 	void OnSetDestinationReleased();
+
+
+	/** Called for forwards/backward input */
+	void MoveForward(float Value);
+
+	/** Called for side to side input */
+	void MoveRight(float Value);
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerSetNewMoveDestination(const FVector DestLocation);
 };
 
 

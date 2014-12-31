@@ -3,6 +3,7 @@
 #include "Unreal4Lab.h"
 #include "Unreal4LabGameMode.h"
 #include "Unreal4LabPlayerController.h"
+#include "LabPlayerProxy.h"
 #include "Unreal4LabCharacter.h"
 
 AUnreal4LabGameMode::AUnreal4LabGameMode(const class FPostConstructInitializeProperties& PCIP) : Super(PCIP)
@@ -11,9 +12,10 @@ AUnreal4LabGameMode::AUnreal4LabGameMode(const class FPostConstructInitializePro
 	PlayerControllerClass = AUnreal4LabPlayerController::StaticClass();
 
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/MyCharacter"));
+	/*static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/MyCharacter"));
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
-	}
+	}*/
+	DefaultPawnClass = ALabPlayerProxy::StaticClass();
 }
