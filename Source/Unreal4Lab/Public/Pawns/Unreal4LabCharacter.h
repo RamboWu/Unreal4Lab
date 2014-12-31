@@ -8,13 +8,6 @@ class AUnreal4LabCharacter : public ALabPawn
 {
 	GENERATED_UCLASS_BODY()
 
-	/** Top down camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	TSubobjectPtr<class UCameraComponent> TopDownCameraComponent;
-
-	/** Camera boom positioning the camera above the character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	TSubobjectPtr<class USpringArmComponent> CameraBoom;
 
 };
 
