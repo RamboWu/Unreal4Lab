@@ -59,7 +59,7 @@ void ALabPlayerProxy::BeginPlay()
 		SpawnParams.bNoCollisionFail = true;
 
 		// Spawn the actual player character at the same location as the Proxy
-		Character = Cast<ALabPawn>(GetWorld()->SpawnActor(CharacterClass, &Location, &Rotation, SpawnParams));
+		Character = Cast<ACharacter>(GetWorld()->SpawnActor(CharacterClass, &Location, &Rotation, SpawnParams));
 
 		// We use the PlayerAI to control the Player Character for Navigation
 		PlayerAI = GetWorld()->SpawnActor<AAIController>(GetActorLocation(), GetActorRotation());

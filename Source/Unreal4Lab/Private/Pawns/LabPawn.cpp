@@ -12,6 +12,7 @@ ALabPawn::ALabPawn(const class FPostConstructInitializeProperties& PCIP)
 
 void ALabPawn::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ALabPawn, m_team_num);
 	DOREPLIFETIME(ALabPawn, m_health);
 }
