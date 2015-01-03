@@ -7,7 +7,5 @@ UCLASS(Blueprintable)
 class AUnreal4LabCharacter : public ALabPawn
 {
 	GENERATED_UCLASS_BODY()
-
-
 };
 

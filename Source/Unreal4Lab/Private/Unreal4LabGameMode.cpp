@@ -19,3 +19,25 @@ AUnreal4LabGameMode::AUnreal4LabGameMode(const class FPostConstructInitializePro
 	}*/
 	DefaultPawnClass = ALabPlayerProxy::StaticClass();
 }
+
+bool AUnreal4LabGameMode::OnFriendlyTeam(const AActor* ActorA, const AActor* ActorB)
+{
+	const ILabTeamInterface* TeamA = InterfaceCast<const ILabTeamInterface>(ActorA);
+	const ILabTeamInterface* TeamB = InterfaceCast<const ILabTeamInterface>(ActorB);
+
+	if ((TeamA != NULL && TeamA->GetTeamNum() == ELabTeam::Unknown) || (TeamB != NULL && TeamB->GetTeamNum() == ELabTeam::Unknown))
+		return true;
+
+	return (TeamA != NULL) && (TeamB != NULL) && (TeamA->GetTeamNum() == TeamB->GetTeamNum());
+}
+
+bool AUnreal4LabGameMode::OnEnemyTeam(const AActor* ActorA, const AActor* ActorB)
+{
+	const ILabTeamInterface* TeamA = InterfaceCast<const ILabTeamInterface>(ActorA);
+	const ILabTeamInterface* TeamB = InterfaceCast<const ILabTeamInterface>(ActorB);
+
+	if ((TeamA != NULL && TeamA->GetTeamNum() == ELabTeam::Unknown) || (TeamB != NULL && TeamB->GetTeamNum() == ELabTeam::Unknown))
+		return false;
+
+	return (TeamA != NULL) && (TeamB != NULL) && (TeamA->GetTeamNum() != TeamB->GetTeamNum());
+}

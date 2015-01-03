@@ -20,6 +20,10 @@ class UNREAL4LAB_API ALabAIController : public AAIController
 	UPROPERTY(Transient)
 	TSubobjectPtr<class UBehaviorTreeComponent> BehaviorComp;
 
+	/** Component used to detect*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Components)
+	TSubobjectPtr<class USphereComponent> SensingComponent;
+
 	virtual void Possess(class APawn *InPawn) override;
 
 
@@ -36,6 +40,14 @@ class UNREAL4LAB_API ALabAIController : public AAIController
 	// Begin AIController Interface
 	virtual void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result) override;
 	// End AIController Interface
+
+	UFUNCTION()
+	void OnBeginOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, 
+		int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+	UFUNCTION()
+	void OnEndOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, 
+		int32 OtherBodyIndex);
 
 protected:
 
@@ -55,5 +67,10 @@ protected:
 
 	/** set to true when we are moving to our target */
 	uint32 bMovingToTarget : 1;
+
+	TArray<class AActor*>	AllTargets;
+
+	/** Current selected target to attack */
+	class AActor*			CurrentTarget;
 
 };

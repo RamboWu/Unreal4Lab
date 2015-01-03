@@ -20,5 +20,6 @@ AUnreal4LabCharacter::AUnreal4LabCharacter(const class FPostConstructInitializeP
 	CharacterMovement->bConstrainToPlane = true;
 	CharacterMovement->bSnapToPlaneAtStart = true;
 
-
+	//SensingComponent->OnComponentBeginOverlap.AddDynamic(this, &AUnreal4LabCharacter::OnBeginOverlap);
 }
+

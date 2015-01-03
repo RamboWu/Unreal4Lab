@@ -6,6 +6,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "LabRobot.h"
 #include "LabAIController.h"
+#include "LabBlueprintLibrary.h"
 
 
 ALabAIController::ALabAIController(const class FPostConstructInitializeProperties& PCIP)
@@ -18,7 +19,11 @@ ALabAIController::ALabAIController(const class FPostConstructInitializePropertie
 
 	BehaviorComp = PCIP.CreateDefaultSubobject<UBehaviorTreeComponent>(this, TEXT("BehaviorComp"));
 
-
+	SensingComponent = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("SensingComponent"));
+	SensingComponent->OnComponentBeginOverlap.AddDynamic(this, &ALabAIController::OnBeginOverlap);
+	SensingComponent->OnComponentEndOverlap.AddDynamic(this, &ALabAIController::OnEndOverlap);
+	//SensingComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SensingComponent->AttachTo(RootComponent);
 }
 
 void ALabAIController::Possess(class APawn *InPawn)
@@ -34,12 +39,27 @@ void ALabAIController::Possess(class APawn *InPawn)
 
 		BehaviorComp->StartTree(Bot->BotBehavior);
 	}
+
+	ILabStateInterface* state = InterfaceCast<ILabStateInterface>(InPawn);
+	if (state)
+	{
+		SensingComponent->InitSphereRadius(state->GetSightDistance());
+	}
 }
 
 void ALabAIController::SetEnemy(class APawn *InPawn)
 {
-	BlackboardComp->SetValueAsObject(EnemyKeyID, InPawn);
-	BlackboardComp->SetValueAsVector(EnemyLocationID, InPawn->GetActorLocation());
+	if (InPawn)
+	{
+		BlackboardComp->SetValueAsObject(EnemyKeyID, InPawn);
+		BlackboardComp->SetValueAsVector(EnemyLocationID, InPawn->GetActorLocation());
+	}
+	else
+	{
+		BlackboardComp->SetValueAsObject(EnemyKeyID, NULL);
+		BlackboardComp->SetValueAsVector(EnemyLocationID, NULL);
+	}
+	
 }
 
 void ALabAIController::SearchForEnemy()
@@ -50,11 +70,24 @@ void ALabAIController::SearchForEnemy()
 		return;
 	}
 
+	APawn* enemey = Cast<APawn>(BlackboardComp->GetValueAsObject(EnemyKeyID));
+
+	//check if the current enemy is still alive and in the sight distance
+	//TODO IsValid 判断是否死亡还不是很准确
+	if (enemey.IsValid())
+	{
+		if (AllTargets.Contains(Cast<AActor>(enemey)))
+		{
+			return;
+		}
+	}
+	SetEnemy(NULL);
+
 	const FVector my_location = my_bot->GetActorLocation();
 	float best_dist = MAX_FLT;
 	ALabPawn* best_target = NULL;
 
-	for (FConstPawnIterator It = GetWorld()->GetPawnIterator(); It; ++It)
+	for (TIterator i = AllTargets.begin(); i != AllTargets.end(); i++)
 	{
 		APawn* tmp_target1 = Cast<APawn>(*It);
 		if (tmp_target1 && my_bot == tmp_target1)
@@ -159,5 +192,27 @@ void ALabAIController::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingRes
 		{
 			PathFollowingComponent->AbortMove(TEXT("close enought"));
 		}
+	}
+}
+
+void ALabAIController::OnBeginOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, 
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+	ILabTeamInterface* team_interface = InterfaceCast<ILabTeamInterface>(OtherActor);
+	AActor self_actor = Cast<AActor>(GetPawn());
+	if (team_interface && self_actor != OtherActor){
+		ULabBlueprintLibrary::printDebugInfo("add a target:");
+		AllTargets.AddUnique(OtherActor);
+	}
+}
+
+void ALabAIController::OnEndOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, 
+	int32 OtherBodyIndex)
+{
+	ILabTeamInterface* team_interface = InterfaceCast<ILabTeamInterface>(OtherActor);
+	AActor self_actor = Cast<AActor>(GetPawn());
+	if (team_interface && self_actor != OtherActor){
+		ULabBlueprintLibrary::printDebugInfo("remove a target:");
+		AllTargets.Remove(OtherActor);
 	}
 }
