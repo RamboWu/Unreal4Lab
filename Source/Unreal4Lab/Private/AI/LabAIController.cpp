@@ -144,7 +144,7 @@ void ALabAIController::MoveCloser()
 		if (dist > AttackDistance)
 		{
 			bMovingToTarget = true;
-			MoveToActor(enemey, 0.9 * AttackDistance);	
+			EPathFollowingRequestResult::Type  request_result = MoveToActor(enemey, 0.9 * AttackDistance);
 		}
 	}
 
