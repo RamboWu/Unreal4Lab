@@ -57,6 +57,7 @@ void ALabAIFactory::OnSpawnCharacter()
 
 			// We use the PlayerAI to control the Player Character for Navigation
 			ALabAIController* PlayerAI = GetWorld()->SpawnActor<ALabAIController>(GetActorLocation(), GetActorRotation());
+			PlayerAI->Route = Route;
 			PlayerAI->Possess(Character);
 		}
 		

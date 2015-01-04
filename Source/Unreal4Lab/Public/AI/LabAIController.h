@@ -26,8 +26,6 @@ class UNREAL4LAB_API ALabAIController : public AAIController
 
 	virtual void Possess(class APawn *InPawn) override;
 
-
-
 	UFUNCTION(BlueprintCallable, Category = Behavior)
 	void SearchForEnemy();
 
@@ -50,9 +48,12 @@ class UNREAL4LAB_API ALabAIController : public AAIController
 	void OnEndOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, 
 		int32 OtherBodyIndex);
 
+	class ALabAIRoute* Route;
+
 protected:
 
 	void SetEnemy(class APawn *InPawn);
+	void SetDestination(int32 index);
 
 	/** move closer to target */
 	void MoveCloser();
@@ -74,4 +75,6 @@ protected:
 	/** Current selected target to attack */
 	class AActor*			CurrentTarget;
 
+private:
+	int32  cur_route_node_index;
 };

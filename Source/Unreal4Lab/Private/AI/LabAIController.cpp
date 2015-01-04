@@ -6,6 +6,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "LabRobot.h"
 #include "Unreal4LabGameMode.h"
+#include "LabAIRoute.h"
 #include "LabAIController.h"
 #include "LabBlueprintLibrary.h"
 
@@ -23,6 +24,8 @@ ALabAIController::ALabAIController(const class FPostConstructInitializePropertie
 	SensingComponent = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("SensingComponent"));
 	SensingComponent->OnComponentBeginOverlap.AddDynamic(this, &ALabAIController::OnBeginOverlap);
 	SensingComponent->OnComponentEndOverlap.AddDynamic(this, &ALabAIController::OnEndOverlap);
+
+	Route = NULL;
 	//SensingComponent->InitSphereRadius(300);
 	//SensingComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	//SensingComponent->AttachTo(RootComponent);
@@ -48,6 +51,12 @@ void ALabAIController::Possess(class APawn *InPawn)
 		SensingComponent->SetSphereRadius(state->GetSightDistance());
 		SensingComponent->AttachTo(InPawn->GetRootComponent());
 	}
+
+	if (Route != NULL)
+	{
+		cur_route_node_index = 0;
+		SetDestination(cur_route_node_index++);
+	}
 }
 
 void ALabAIController::SetEnemy(class APawn *InPawn)
@@ -55,16 +64,29 @@ void ALabAIController::SetEnemy(class APawn *InPawn)
 	if (InPawn)
 	{
 		BlackboardComp->SetValueAsObject(EnemyKeyID, InPawn);
-		BlackboardComp->SetValueAsVector(EnemyLocationID, InPawn->GetActorLocation());
 	}
 	else
 	{
-
 		BlackboardComp->SetValueAsObject(EnemyKeyID, NULL);
-		BlackboardComp->ClearValueAsVector(EnemyLocationID);
 	}
 	
 }
+
+
+void ALabAIController::SetDestination(int32 index)
+{
+	if (Route)
+	{
+		if (index < Route->all_targets.Num())
+		{
+			
+			BlackboardComp->SetValueAsVector(EnemyLocationID, Route->all_targets[index]->GetActorLocation());
+		}
+		
+	}
+	
+}
+
 
 void ALabAIController::SearchForEnemy()
 {
@@ -194,11 +216,19 @@ void ALabAIController::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingRes
 {
 	if (Result != EPathFollowingResult::Skipped)
 	{
-		bMovingToTarget = false;
-		if (PathFollowingComponent.IsValid())
+		if (bMovingToTarget)
 		{
-			PathFollowingComponent->AbortMove(TEXT("close enought"));
+			bMovingToTarget = false;
+			if (PathFollowingComponent.IsValid())
+			{
+				PathFollowingComponent->AbortMove(TEXT("close enought"));
+			}
 		}
+		else
+		{
+			SetDestination(cur_route_node_index++);
+		}
+		
 	}
 }
 
@@ -241,3 +271,4 @@ void ALabAIController::OnEndOverlap(class AActor* OtherActor, class UPrimitiveCo
 		}
 	}
 }
+
