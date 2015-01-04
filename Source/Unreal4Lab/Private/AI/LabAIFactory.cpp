@@ -62,7 +62,7 @@ void ALabAIFactory::OnSpawnCharacter()
 		}
 		
 
-		next_spawn_time = GetWorld()->GetTimeSeconds() + 0.2f;
+		next_spawn_time = GetWorld()->GetTimeSeconds() + 0.5f;
 	}
 }
 
