@@ -47,7 +47,7 @@ class UNREAL4LAB_API ALabPawn : public ACharacter, public ILabTeamInterface, pub
 		int32 OtherBodyIndex);*/
 
 
-	UFUNCTION()
+	UFUNCTION(NetMulticast, Unreliable)
 	void Client_PlayMeleeAnim();
 
 

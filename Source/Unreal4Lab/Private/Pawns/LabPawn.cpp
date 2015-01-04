@@ -54,7 +54,7 @@ uint32 ALabPawn::GetAttackRange() const
 	return m_base_attack_range;
 }
 
-void ALabPawn::Client_PlayMeleeAnim()
+void ALabPawn::Client_PlayMeleeAnim_Implementation()
 {
 
 	if ((m_health > 0.f) && MeleeAnim)

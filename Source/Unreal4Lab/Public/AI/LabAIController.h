@@ -34,6 +34,7 @@ class UNREAL4LAB_API ALabAIController : public AAIController
 	UFUNCTION(BlueprintCallable, Category = Behavior)
 	bool withInAttackRange();
 
+	/*Server */
 	UFUNCTION(BlueprintCallable, Category = Behavior)
 	void Attack();
 

@@ -139,26 +139,29 @@ bool ALabAIController::withInAttackRange()
 
 void ALabAIController::Attack()
 {
-	ALabPawn* self_pawn = Cast<ALabPawn>(GetPawn());
-	APawn* enemey = Cast<APawn>(BlackboardComp->GetValueAsObject(EnemyKeyID));
+	if (HasAuthority()){
+		ALabPawn* self_pawn = Cast<ALabPawn>(GetPawn());
+		APawn* enemey = Cast<APawn>(BlackboardComp->GetValueAsObject(EnemyKeyID));
 
-	bIsPlayingAnimation = GetWorld()->GetTimeSeconds() < MeleeAttackAnimationEndTime;
+		bIsPlayingAnimation = GetWorld()->GetTimeSeconds() < MeleeAttackAnimationEndTime;
 
 
-	if (self_pawn && !bIsPlayingAnimation && enemey)
-	{
-
-		// try move closer if needed again
-		MoveCloser();
-
-		if (!bMovingToTarget)
+		if (self_pawn && !bIsPlayingAnimation && enemey)
 		{
-			self_pawn->Client_PlayMeleeAnim();
-			MeleeAttackAnimationEndTime = GetWorld()->GetTimeSeconds() + 1.f;
-			bIsPlayingAnimation = true;
-		}
 
+			// try move closer if needed again
+			MoveCloser();
+
+			if (!bMovingToTarget)
+			{
+				self_pawn->Client_PlayMeleeAnim();
+				MeleeAttackAnimationEndTime = GetWorld()->GetTimeSeconds() + 1.f;
+				bIsPlayingAnimation = true;
+			}
+
+		}
 	}
+
 }
 
 void ALabAIController::MoveCloser()
