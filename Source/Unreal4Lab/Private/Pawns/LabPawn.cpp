@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Unreal4Lab.h"
+#include "LabBlueprintLibrary.h"
 #include "LabPawn.h"
 
 
@@ -8,6 +9,12 @@ ALabPawn::ALabPawn(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP), m_base_health(100), m_health(100), m_base_attack_range(100), m_base_sight_distance(300)
 {
 	bReplicates = true;
+
+	//SensingComponent = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("SensingComponent"));
+	//SensingComponent->OnComponentBeginOverlap.AddDynamic(this, &ALabPawn::OnBeginOverlap);
+	//SensingComponent->OnComponentEndOverlap.AddDynamic(this, &ALabPawn::OnEndOverlap);
+	//SensingComponent->AttachTo(RootComponent);
+
 }
 
 void ALabPawn::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -62,3 +69,34 @@ uint32 ALabPawn::GetSightDistance()
 {
 	return m_base_sight_distance;
 }
+/*
+void ALabPawn::OnBeginOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+	ILabTeamInterface* team_interface = InterfaceCast<ILabTeamInterface>(OtherActor);
+
+	if (team_interface){
+		ALabPawn* target = Cast<ALabPawn>(OtherActor);
+		if (target)
+		{
+			ULabBlueprintLibrary::printDebugInfo("add a target:");
+			//AllTargets.AddUnique(OtherActor);
+		}
+
+	}
+}
+
+void ALabPawn::OnEndOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex)
+{
+	ILabTeamInterface* team_interface = InterfaceCast<ILabTeamInterface>(OtherActor);
+	if (team_interface){
+		ALabPawn* target = Cast<ALabPawn>(OtherActor);
+		if (target)
+		{
+			ULabBlueprintLibrary::printDebugInfo("remove a target:");
+			//AllTargets.Remove(OtherActor);
+		}
+	}
+}
+*/

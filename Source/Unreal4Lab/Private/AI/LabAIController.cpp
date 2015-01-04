@@ -22,8 +22,9 @@ ALabAIController::ALabAIController(const class FPostConstructInitializePropertie
 	SensingComponent = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("SensingComponent"));
 	SensingComponent->OnComponentBeginOverlap.AddDynamic(this, &ALabAIController::OnBeginOverlap);
 	SensingComponent->OnComponentEndOverlap.AddDynamic(this, &ALabAIController::OnEndOverlap);
+	//SensingComponent->InitSphereRadius(300);
 	//SensingComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SensingComponent->AttachTo(RootComponent);
+	//SensingComponent->AttachTo(RootComponent);
 }
 
 void ALabAIController::Possess(class APawn *InPawn)
@@ -43,7 +44,8 @@ void ALabAIController::Possess(class APawn *InPawn)
 	ILabStateInterface* state = InterfaceCast<ILabStateInterface>(InPawn);
 	if (state)
 	{
-		SensingComponent->InitSphereRadius(state->GetSightDistance());
+		SensingComponent->SetSphereRadius(state->GetSightDistance());
+		SensingComponent->AttachTo(InPawn->GetRootComponent());
 	}
 }
 
@@ -56,8 +58,9 @@ void ALabAIController::SetEnemy(class APawn *InPawn)
 	}
 	else
 	{
+
 		BlackboardComp->SetValueAsObject(EnemyKeyID, NULL);
-		BlackboardComp->SetValueAsVector(EnemyLocationID, NULL);
+		BlackboardComp->ClearValueAsVector(EnemyLocationID);
 	}
 	
 }
@@ -74,7 +77,7 @@ void ALabAIController::SearchForEnemy()
 
 	//check if the current enemy is still alive and in the sight distance
 	//TODO IsValid 判断是否死亡还不是很准确
-	if (enemey.IsValid())
+	if (enemey)
 	{
 		if (AllTargets.Contains(Cast<AActor>(enemey)))
 		{
@@ -87,15 +90,15 @@ void ALabAIController::SearchForEnemy()
 	float best_dist = MAX_FLT;
 	ALabPawn* best_target = NULL;
 
-	for (TIterator i = AllTargets.begin(); i != AllTargets.end(); i++)
+	for (int32 i = 0; i < AllTargets.Num(); i++)
 	{
-		APawn* tmp_target1 = Cast<APawn>(*It);
+		APawn* tmp_target1 = Cast<APawn>(AllTargets[i]);
 		if (tmp_target1 && my_bot == tmp_target1)
 		{
 			continue;
 		}
 
-		ALabPawn* tmp_target = Cast<ALabPawn>(*It);
+		ALabPawn* tmp_target = Cast<ALabPawn>(AllTargets[i]);
 		if (tmp_target)
 		{
 			const float dist = FVector::Dist(tmp_target->GetActorLocation(), my_location);
@@ -199,10 +202,15 @@ void ALabAIController::OnBeginOverlap(class AActor* OtherActor, class UPrimitive
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
 	ILabTeamInterface* team_interface = InterfaceCast<ILabTeamInterface>(OtherActor);
-	AActor self_actor = Cast<AActor>(GetPawn());
-	if (team_interface && self_actor != OtherActor){
-		ULabBlueprintLibrary::printDebugInfo("add a target:");
-		AllTargets.AddUnique(OtherActor);
+	AActor* self_actor = Cast<AActor>(GetPawn());
+	if (team_interface && self_actor != NULL && self_actor != OtherActor){
+		ALabPawn* target = Cast<ALabPawn>(OtherActor);
+		if (target)
+		{
+			ULabBlueprintLibrary::printDebugInfo("add a target:" + OtherActor->GetName());
+			AllTargets.AddUnique(OtherActor);
+		}
+		
 	}
 }
 
@@ -210,9 +218,13 @@ void ALabAIController::OnEndOverlap(class AActor* OtherActor, class UPrimitiveCo
 	int32 OtherBodyIndex)
 {
 	ILabTeamInterface* team_interface = InterfaceCast<ILabTeamInterface>(OtherActor);
-	AActor self_actor = Cast<AActor>(GetPawn());
-	if (team_interface && self_actor != OtherActor){
-		ULabBlueprintLibrary::printDebugInfo("remove a target:");
-		AllTargets.Remove(OtherActor);
+	AActor* self_actor = Cast<AActor>(GetPawn());
+	if (team_interface && self_actor != NULL && self_actor != OtherActor){
+		ALabPawn* target = Cast<ALabPawn>(OtherActor);
+		if (target)
+		{
+			ULabBlueprintLibrary::printDebugInfo("remove a target:" + OtherActor->GetName());
+			AllTargets.Remove(OtherActor);
+		}
 	}
 }

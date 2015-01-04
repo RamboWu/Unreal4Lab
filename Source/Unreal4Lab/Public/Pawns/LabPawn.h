@@ -35,7 +35,16 @@ class UNREAL4LAB_API ALabPawn : public ACharacter, public ILabTeamInterface, pub
 	/** set team number */
 	void SetTeamNum(uint8 NewTeamNum);
 
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Components)
+	TSubobjectPtr<class USphereComponent> SensingComponent;
 
+	UFUNCTION()
+		void OnBeginOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+	UFUNCTION()
+		void OnEndOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex);*/
 
 
 	UFUNCTION()
