@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Unreal4Lab.h"
+#include "LabPawn.h"
 #include "AIController.h"
 #include "LabAIController.h"
 #include "LabAIFactory.h"
@@ -48,11 +49,17 @@ void ALabAIFactory::OnSpawnCharacter()
 		FRotator Rotation = GetActorRotation();
 
 		// Spawn the actual player character at the same location as the Proxy
-		ACharacter* Character = Cast<ACharacter>(GetWorld()->SpawnActor(CharacterClass, &Location, &Rotation));
+		ALabPawn* Character = Cast<ALabPawn>(GetWorld()->SpawnActor(CharacterClass, &Location, &Rotation));
 
-		// We use the PlayerAI to control the Player Character for Navigation
-		ALabAIController* PlayerAI = GetWorld()->SpawnActor<ALabAIController>(GetActorLocation(), GetActorRotation());
-		PlayerAI->Possess(Character);
+		if (Character)
+		{
+			Character->SetTeamNum(TeamNum);
+
+			// We use the PlayerAI to control the Player Character for Navigation
+			ALabAIController* PlayerAI = GetWorld()->SpawnActor<ALabAIController>(GetActorLocation(), GetActorRotation());
+			PlayerAI->Possess(Character);
+		}
+		
 
 		next_spawn_time = GetWorld()->GetTimeSeconds() + 0.2f;
 	}

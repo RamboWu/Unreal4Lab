@@ -16,7 +16,7 @@ class UNREAL4LAB_API ALabAIFactory : public AActor
 
 	// Pawn archetype to spawn
 	UPROPERTY(EditAnywhere, Category = AIFactory)
-	TSubclassOf<AActor> CharacterClass;
+	TSubclassOf<class ALabPawn> CharacterClass;
 
 	// Time between each spawn
 	UPROPERTY(EditAnywhere, Category = AIFactory)
