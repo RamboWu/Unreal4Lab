@@ -4,7 +4,7 @@
 #include "AIController.h"
 #include "LabAIController.h"
 #include "LabAIFactory.h"
-
+#include "LabBlueprintLibrary.h"
 
 ALabAIFactory::ALabAIFactory(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
@@ -12,7 +12,9 @@ ALabAIFactory::ALabAIFactory(const class FPostConstructInitializeProperties& PCI
 	SpawnInterval = 30.f;
 	SpawnNum = 4;
 	TeamNum = ELabTeam::Neutral;
-	
+	left_spawn_num = 0;
+
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void ALabAIFactory::BeginPlay()
@@ -25,7 +27,8 @@ void ALabAIFactory::BeginPlay()
 		{
 			if (SpawnInterval > 0.f)
 			{
-				GetWorldTimerManager().SetTimer(this, &ALabAIFactory::OnSpawnCharacter, SpawnInterval, true);
+				
+				GetWorldTimerManager().SetTimer(this, &ALabAIFactory::OnNeedToSpawn, SpawnInterval, true);
 			}
 		}
 	}
@@ -36,25 +39,40 @@ void ALabAIFactory::OnSpawnCharacter()
 {
 	if (Role == ROLE_Authority)
 	{
-		for (uint32 i = 0; i < SpawnNum; i++)
-		{
-			// Get current location of the Player Proxy
-			FVector Location = GetActorLocation();
-			FRotator Rotation = GetActorRotation();
+		ULabBlueprintLibrary::printDebugInfo("OnSpawnCharacter");
 
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = this;
-			SpawnParams.Instigator = Instigator;
-			SpawnParams.bNoCollisionFail = true;
+		left_spawn_num--;
 
-			// Spawn the actual player character at the same location as the Proxy
-			ACharacter* Character = Cast<ACharacter>(GetWorld()->SpawnActor(CharacterClass, &Location, &Rotation, SpawnParams));
+		// Get current location of the Player Proxy
+		FVector Location = GetActorLocation();
+		FRotator Rotation = GetActorRotation();
 
-			// We use the PlayerAI to control the Player Character for Navigation
-			ALabAIController* PlayerAI = GetWorld()->SpawnActor<ALabAIController>(GetActorLocation(), GetActorRotation());
-			PlayerAI->Possess(Character);
-		}
+		// Spawn the actual player character at the same location as the Proxy
+		ACharacter* Character = Cast<ACharacter>(GetWorld()->SpawnActor(CharacterClass, &Location, &Rotation));
 
+		// We use the PlayerAI to control the Player Character for Navigation
+		ALabAIController* PlayerAI = GetWorld()->SpawnActor<ALabAIController>(GetActorLocation(), GetActorRotation());
+		PlayerAI->Possess(Character);
+
+		next_spawn_time = GetWorld()->GetTimeSeconds() + 0.2f;
+	}
+}
+
+
+void ALabAIFactory::OnNeedToSpawn()
+{
+	left_spawn_num += SpawnNum;	
+	next_spawn_time = GetWorld()->GetTimeSeconds();
+	ULabBlueprintLibrary::printDebugInfo("OnNeedToSpawn" + FString::FromInt(left_spawn_num) + " Time=" + FString::SanitizeFloat(next_spawn_time));
+}
+
+
+void ALabAIFactory::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	if (left_spawn_num > 0 && GetWorld()->GetTimeSeconds() > next_spawn_time)
+	{
+		OnSpawnCharacter();
 	}
 }
 

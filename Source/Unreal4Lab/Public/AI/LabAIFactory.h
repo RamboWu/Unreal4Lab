@@ -33,7 +33,13 @@ class UNREAL4LAB_API ALabAIFactory : public AActor
 
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	void OnSpawnCharacter();
+	void OnNeedToSpawn();
+
+private:
+	uint32 left_spawn_num;
+	float next_spawn_time;
 };
