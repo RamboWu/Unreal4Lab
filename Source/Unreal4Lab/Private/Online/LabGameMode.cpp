@@ -5,6 +5,7 @@
 #include "Unreal4LabPlayerController.h"
 #include "LabPlayerProxy.h"
 #include "Unreal4LabCharacter.h"
+#include "LabPlayerState.h"
 
 ALabGameMode::ALabGameMode(const class FPostConstructInitializeProperties& PCIP) : Super(PCIP)
 {
@@ -12,28 +13,8 @@ ALabGameMode::ALabGameMode(const class FPostConstructInitializeProperties& PCIP)
 	PlayerControllerClass = AUnreal4LabPlayerController::StaticClass();
 
 	DefaultPawnClass = ALabPlayerProxy::StaticClass();
-}
+	PlayerStateClass = ALabPlayerState::StaticClass();
 
-bool ALabGameMode::OnFriendlyTeam(const AActor* ActorA, const AActor* ActorB)
-{
-	const ILabTeamInterface* TeamA = InterfaceCast<const ILabTeamInterface>(ActorA);
-	const ILabTeamInterface* TeamB = InterfaceCast<const ILabTeamInterface>(ActorB);
-
-	if ((TeamA != NULL && TeamA->GetTeamNum() == ELabTeam::Unknown) || (TeamB != NULL && TeamB->GetTeamNum() == ELabTeam::Unknown))
-		return true;
-
-	return (TeamA != NULL) && (TeamB != NULL) && (TeamA->GetTeamNum() == TeamB->GetTeamNum());
-}
-
-bool ALabGameMode::OnEnemyTeam(const AActor* ActorA, const AActor* ActorB)
-{
-	const ILabTeamInterface* TeamA = InterfaceCast<const ILabTeamInterface>(ActorA);
-	const ILabTeamInterface* TeamB = InterfaceCast<const ILabTeamInterface>(ActorB);
-
-	if ((TeamA != NULL && TeamA->GetTeamNum() == ELabTeam::Unknown) || (TeamB != NULL && TeamB->GetTeamNum() == ELabTeam::Unknown))
-		return false;
-
-	return (TeamA != NULL) && (TeamB != NULL) && (TeamA->GetTeamNum() != TeamB->GetTeamNum());
 }
 
 void ALabGameMode::PreLogin(const FString& Options, const FString& Address, const TSharedPtr<class FUniqueNetId>& UniqueId, FString& ErrorMessage)
@@ -129,4 +110,26 @@ bool ALabGameMode::IsSpawnpointPreferred(APlayerStart* SpawnPoint, AController* 
 	}
 
 	return true;
+}
+
+bool ALabGameMode::OnFriendlyTeam(const AActor* ActorA, const AActor* ActorB)
+{
+	const ILabTeamInterface* TeamA = InterfaceCast<const ILabTeamInterface>(ActorA);
+	const ILabTeamInterface* TeamB = InterfaceCast<const ILabTeamInterface>(ActorB);
+
+	if ((TeamA != NULL && TeamA->GetTeamNum() == ELabTeam::Unknown) || (TeamB != NULL && TeamB->GetTeamNum() == ELabTeam::Unknown))
+		return true;
+
+	return (TeamA != NULL) && (TeamB != NULL) && (TeamA->GetTeamNum() == TeamB->GetTeamNum());
+}
+
+bool ALabGameMode::OnEnemyTeam(const AActor* ActorA, const AActor* ActorB)
+{
+	const ILabTeamInterface* TeamA = InterfaceCast<const ILabTeamInterface>(ActorA);
+	const ILabTeamInterface* TeamB = InterfaceCast<const ILabTeamInterface>(ActorB);
+
+	if ((TeamA != NULL && TeamA->GetTeamNum() == ELabTeam::Unknown) || (TeamB != NULL && TeamB->GetTeamNum() == ELabTeam::Unknown))
+		return false;
+
+	return (TeamA != NULL) && (TeamB != NULL) && (TeamA->GetTeamNum() != TeamB->GetTeamNum());
 }

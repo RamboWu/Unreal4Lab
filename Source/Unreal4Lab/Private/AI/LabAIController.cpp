@@ -244,7 +244,7 @@ void ALabAIController::OnBeginOverlap(class AActor* OtherActor, class UPrimitive
 			
 			if (ALabGameMode::OnEnemyTeam(self_actor, OtherActor))
 			{
-				ULabBlueprintLibrary::printDebugInfo("add a target:" + OtherActor->GetName());
+				//ULabBlueprintLibrary::printDebugInfo("add a target:" + OtherActor->GetName());
 				AllTargets.AddUnique(OtherActor);
 			}
 		}
@@ -264,7 +264,7 @@ void ALabAIController::OnEndOverlap(class AActor* OtherActor, class UPrimitiveCo
 			
 			if (ALabGameMode::OnEnemyTeam(self_actor, OtherActor))
 			{
-				ULabBlueprintLibrary::printDebugInfo("remove a target:" + OtherActor->GetName());
+				//ULabBlueprintLibrary::printDebugInfo("remove a target:" + OtherActor->GetName());
 				AllTargets.Remove(OtherActor);
 			}
 

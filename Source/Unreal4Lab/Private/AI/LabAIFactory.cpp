@@ -40,7 +40,7 @@ void ALabAIFactory::OnSpawnCharacter()
 {
 	if (Role == ROLE_Authority)
 	{
-		ULabBlueprintLibrary::printDebugInfo("OnSpawnCharacter");
+		//ULabBlueprintLibrary::printDebugInfo("OnSpawnCharacter");
 
 		left_spawn_num--;
 
@@ -71,7 +71,7 @@ void ALabAIFactory::OnNeedToSpawn()
 {
 	left_spawn_num += SpawnNum;	
 	next_spawn_time = GetWorld()->GetTimeSeconds();
-	ULabBlueprintLibrary::printDebugInfo("OnNeedToSpawn" + FString::FromInt(left_spawn_num) + " Time=" + FString::SanitizeFloat(next_spawn_time));
+	//ULabBlueprintLibrary::printDebugInfo("OnNeedToSpawn" + FString::FromInt(left_spawn_num) + " Time=" + FString::SanitizeFloat(next_spawn_time));
 }
 
 
