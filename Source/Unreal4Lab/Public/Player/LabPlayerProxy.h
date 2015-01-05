@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "GameFramework/Pawn.h"
+#include "LabPawn.h"
 #include "LabPlayerProxy.generated.h"
 
 /**
@@ -26,7 +26,7 @@ class UNREAL4LAB_API ALabPlayerProxy : public APawn
 
 	// Pointer to the actual character. We replicate it so we know its location for the camera on the client 
 	UPROPERTY(Replicated)
-	class ACharacter* Character;
+	class ALabPawn* Character;
 
 	// The AI Controller we will use to auto-navigate the player 
 	class AAIController* PlayerAI;
@@ -39,5 +39,11 @@ class UNREAL4LAB_API ALabPlayerProxy : public APawn
 
 	// Used by the controller to get moving to work 
 	void MoveToLocation(const class AUnreal4LabPlayerController* controller, const FVector& vector);
+
+protected:
+	uint32 bSetTeamNum : 1;
 	
+private:
+	
+	void setTeamNum();
 };

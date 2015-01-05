@@ -1,8 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Unreal4Lab.h"
+#include "LabBlueprintLibrary.h"
 #include "LabPlayerProxy.h"
 #include "AIController.h"
+#include "LabPlayerState.h"
 #include "Unreal4LabPlayerController.h"
 #include "LabPawn.h"
 
@@ -41,7 +43,7 @@ ALabPlayerProxy::ALabPlayerProxy(const class FPostConstructInitializeProperties&
 		static ConstructorHelpers::FObjectFinder<UClass> PlayerPawnBPClass(TEXT("/Game/Blueprints/MyCharacter.MyCharacter_C"));
 		CharacterClass = PlayerPawnBPClass.Object;
 	}
-
+	bSetTeamNum = false;
 }
 
 void ALabPlayerProxy::BeginPlay()
@@ -59,11 +61,17 @@ void ALabPlayerProxy::BeginPlay()
 		SpawnParams.bNoCollisionFail = true;
 
 		// Spawn the actual player character at the same location as the Proxy
-		Character = Cast<ACharacter>(GetWorld()->SpawnActor(CharacterClass, &Location, &Rotation, SpawnParams));
+		Character = Cast<ALabPawn>(GetWorld()->SpawnActor(CharacterClass, &Location, &Rotation, SpawnParams));
 
-		// We use the PlayerAI to control the Player Character for Navigation
-		PlayerAI = GetWorld()->SpawnActor<AAIController>(GetActorLocation(), GetActorRotation());
-		PlayerAI->Possess(Character);
+		if (Character)
+		{
+			setTeamNum();
+				
+			// We use the PlayerAI to control the Player Character for Navigation
+			PlayerAI = GetWorld()->SpawnActor<AAIController>(GetActorLocation(), GetActorRotation());
+			PlayerAI->Possess(Character);
+		}
+		
 	}
 
 }
@@ -83,6 +91,15 @@ void ALabPlayerProxy::Tick(float DeltaTime)
 
 		SetActorTransform(Transform);
 
+	}
+
+	//由于时机问题，之前没有给英雄设置上Team
+	if (HasAuthority())
+	{
+		if (!bSetTeamNum && PlayerState)
+		{
+			setTeamNum();
+		}
 	}
 }
 
@@ -105,4 +122,18 @@ void ALabPlayerProxy::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 
 	// Replicate to Everyone
 	DOREPLIFETIME(ALabPlayerProxy, Character);
+}
+
+void ALabPlayerProxy::setTeamNum()
+{
+	if (Character)
+	{
+		//Set the Team for the hero
+		ALabPlayerState* player_state = Cast<ALabPlayerState>(PlayerState);
+		if (player_state){
+			bSetTeamNum = true;
+			Character->SetTeamNum(player_state->GetTeamNum());
+		}
+	}
+	
 }

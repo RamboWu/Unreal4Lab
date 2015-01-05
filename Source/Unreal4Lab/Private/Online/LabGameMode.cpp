@@ -7,7 +7,8 @@
 #include "Unreal4LabCharacter.h"
 #include "LabPlayerState.h"
 
-ALabGameMode::ALabGameMode(const class FPostConstructInitializeProperties& PCIP) : Super(PCIP)
+ALabGameMode::ALabGameMode(const class FPostConstructInitializeProperties& PCIP) 
+	: Super(PCIP)
 {
 	// use our custom PlayerController class
 	PlayerControllerClass = AUnreal4LabPlayerController::StaticClass();
