@@ -5,7 +5,7 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "LabRobot.h"
-#include "Unreal4LabGameMode.h"
+#include "LabGameMode.h"
 #include "LabAIRoute.h"
 #include "LabAIController.h"
 #include "LabBlueprintLibrary.h"
@@ -242,7 +242,7 @@ void ALabAIController::OnBeginOverlap(class AActor* OtherActor, class UPrimitive
 		if (target)
 		{
 			
-			if (AUnreal4LabGameMode::OnEnemyTeam(self_actor, OtherActor))
+			if (ALabGameMode::OnEnemyTeam(self_actor, OtherActor))
 			{
 				ULabBlueprintLibrary::printDebugInfo("add a target:" + OtherActor->GetName());
 				AllTargets.AddUnique(OtherActor);
@@ -262,7 +262,7 @@ void ALabAIController::OnEndOverlap(class AActor* OtherActor, class UPrimitiveCo
 		if (target)
 		{
 			
-			if (AUnreal4LabGameMode::OnEnemyTeam(self_actor, OtherActor))
+			if (ALabGameMode::OnEnemyTeam(self_actor, OtherActor))
 			{
 				ULabBlueprintLibrary::printDebugInfo("remove a target:" + OtherActor->GetName());
 				AllTargets.Remove(OtherActor);
