@@ -5,7 +5,8 @@
 
 
 ULabPawnReplicationInfo::ULabPawnReplicationInfo(const class FPostConstructInitializeProperties& PCIP)
-	: Super(PCIP)
+	: Super(PCIP),
+	Level(1)
 {
 	//bReplicates = true;
 }
@@ -15,4 +16,5 @@ void ULabPawnReplicationInfo::GetLifetimeReplicatedProps(TArray< FLifetimeProper
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ULabPawnReplicationInfo, HealthMax);
 	DOREPLIFETIME(ULabPawnReplicationInfo, HealthRegenerationAmount);
+	DOREPLIFETIME(ULabPawnReplicationInfo, Level);
 }

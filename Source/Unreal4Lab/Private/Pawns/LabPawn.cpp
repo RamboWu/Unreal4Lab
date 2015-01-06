@@ -24,7 +24,7 @@ void ALabPawn::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ALabPawn, m_team_num);
 	DOREPLIFETIME(ALabPawn, Health);
-	//DOREPLIFETIME(ALabPawn, PawnReplicationInfo);
+	DOREPLIFETIME(ALabPawn, PawnReplicationInfo);
 }
 
 uint8 ALabPawn::GetTeamNum() const
@@ -82,11 +82,11 @@ void ALabPawn::Tick(float DeltaTime)
 		RecalculateStats();
 
 		// Update the health and mana
-		/*if (PawnReplicationInfo != NULL)
+		if (PawnReplicationInfo != NULL)
 		{
 			Health = FMath::Min(float(PawnReplicationInfo->HealthMax), Health + (PawnReplicationInfo->HealthRegenerationAmount * DeltaTime));
 			//Mana = FMin(UDKMOBAPawnReplicationInfo.ManaMax, Mana + (UDKMOBAPawnReplicationInfo.ManaRegenerationAmount * DeltaTime));
-		}*/
+		}
 	}
 
 }
@@ -108,7 +108,7 @@ void ALabPawn::RecalculateStats()
 	if (!HasAuthority())
 		return;
 
-	/*if (StatsModifier == NULL)
+	if (StatsModifier == NULL)
 	{
 		return;
 	}
@@ -123,13 +123,12 @@ void ALabPawn::RecalculateStats()
 		// Now can go through the rest
 		//UDKMOBAPawnReplicationInfo.ManaMax = StatsModifier.CalculateStat(STATNAME_ManaMax, BaseMana);
 
-		//TODO
-		//PawnReplicationInfo->HealthMax = StatsModifier.CalculateStat(STATNAME_HPMax, BaseHealth);
+		PawnReplicationInfo->HealthMax = StatsModifier->CalculateStat(STATNAME_HPMax, BaseHealth);
 		// If just spawned, then set Mana  and Health to Max
 		if (JustSpawned)
 		{
 			JustSpawned = false;
 			Health = PawnReplicationInfo->HealthMax;
 		}
-	}*/
+	}
 }

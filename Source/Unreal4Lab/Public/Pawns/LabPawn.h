@@ -40,7 +40,7 @@ class UNREAL4LAB_API ALabPawn : public ACharacter, public ILabTeamInterface, pub
 	void Client_PlayMeleeAnim();
 
 
-	//UPROPERTY(BlueprintReadOnly, Replicated, Category = State)
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = State)
 	class ULabPawnReplicationInfo* PawnReplicationInfo;
 
 	virtual void BeginPlay() override;

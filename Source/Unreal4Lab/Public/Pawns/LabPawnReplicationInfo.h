@@ -19,4 +19,7 @@ class UNREAL4LAB_API ULabPawnReplicationInfo : public UObject
 	// How much health the pawn should regenerate per second
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = State)
 	float HealthRegenerationAmount;
+
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = State)
+	uint32 Level;
 };
