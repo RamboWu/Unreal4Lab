@@ -1,18 +1,18 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 
 #include "Unreal4Lab.h"
-#include "Unreal4LabPlayerController.h"
+#include "LabPlayerController.h"
 #include "LabPlayerProxy.h"
 #include "AI/Navigation/NavigationSystem.h"
 
-AUnreal4LabPlayerController::AUnreal4LabPlayerController(const class FPostConstructInitializeProperties& PCIP)
+ALabPlayerController::ALabPlayerController(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 }
 
-void AUnreal4LabPlayerController::PlayerTick(float DeltaTime)
+void ALabPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
@@ -23,23 +23,23 @@ void AUnreal4LabPlayerController::PlayerTick(float DeltaTime)
 	}
 }
 
-void AUnreal4LabPlayerController::SetupInputComponent()
+void ALabPlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AUnreal4LabPlayerController::OnSetDestinationPressed);
-	InputComponent->BindAction("SetDestination", IE_Released, this, &AUnreal4LabPlayerController::OnSetDestinationReleased);
+	InputComponent->BindAction("SetDestination", IE_Pressed, this, &ALabPlayerController::OnSetDestinationPressed);
+	InputComponent->BindAction("SetDestination", IE_Released, this, &ALabPlayerController::OnSetDestinationReleased);
 
 	// support touch devices 
-	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AUnreal4LabPlayerController::MoveToTouchLocation);
-	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AUnreal4LabPlayerController::MoveToTouchLocation);
+	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &ALabPlayerController::MoveToTouchLocation);
+	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &ALabPlayerController::MoveToTouchLocation);
 
-	InputComponent->BindAxis("MoveForward", this, &AUnreal4LabPlayerController::MoveForward);
-	InputComponent->BindAxis("MoveRight", this, &AUnreal4LabPlayerController::MoveRight);
+	InputComponent->BindAxis("MoveForward", this, &ALabPlayerController::MoveForward);
+	InputComponent->BindAxis("MoveRight", this, &ALabPlayerController::MoveRight);
 }
 
-void AUnreal4LabPlayerController::MoveToMouseCursor()
+void ALabPlayerController::MoveToMouseCursor()
 {
 	// Trace to see what is under the mouse cursor
 	FHitResult Hit;
@@ -54,7 +54,7 @@ void AUnreal4LabPlayerController::MoveToMouseCursor()
 	}
 }
 
-void AUnreal4LabPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
+void ALabPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
 {
 	FVector2D ScreenSpaceLocation(Location);
 
@@ -69,24 +69,24 @@ void AUnreal4LabPlayerController::MoveToTouchLocation(const ETouchIndex::Type Fi
 	}
 }
 
-void AUnreal4LabPlayerController::SetNewMoveDestination(const FVector DestLocation)
+void ALabPlayerController::SetNewMoveDestination(const FVector DestLocation)
 {
 	ServerSetNewMoveDestination(DestLocation);
 }
 
-void AUnreal4LabPlayerController::OnSetDestinationPressed()
+void ALabPlayerController::OnSetDestinationPressed()
 {
 	// set flag to keep updating destination until released
 	bMoveToMouseCursor = true;
 }
 
-void AUnreal4LabPlayerController::OnSetDestinationReleased()
+void ALabPlayerController::OnSetDestinationReleased()
 {
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
 }
 
-void AUnreal4LabPlayerController::MoveForward(float Value)
+void ALabPlayerController::MoveForward(float Value)
 {
 	if (Value != 0.0f)
 	{
@@ -101,7 +101,7 @@ void AUnreal4LabPlayerController::MoveForward(float Value)
 	}
 }
 
-void AUnreal4LabPlayerController::MoveRight(float Value)
+void ALabPlayerController::MoveRight(float Value)
 {
 	if (Value != 0.0f)
 	{
@@ -117,13 +117,13 @@ void AUnreal4LabPlayerController::MoveRight(float Value)
 	}
 }
 
-bool AUnreal4LabPlayerController::ServerSetNewMoveDestination_Validate(const FVector DestLocation)
+bool ALabPlayerController::ServerSetNewMoveDestination_Validate(const FVector DestLocation)
 {
 	return true;
 }
 
 /* Actual implementation of the ServerSetMoveDestination method */
-void AUnreal4LabPlayerController::ServerSetNewMoveDestination_Implementation(const FVector DestLocation)
+void ALabPlayerController::ServerSetNewMoveDestination_Implementation(const FVector DestLocation)
 {
 	ALabPlayerProxy* Pawn = Cast<ALabPlayerProxy>(GetPawn());
 	if (Pawn)

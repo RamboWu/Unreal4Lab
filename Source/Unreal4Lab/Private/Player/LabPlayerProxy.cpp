@@ -5,7 +5,7 @@
 #include "LabPlayerProxy.h"
 #include "AIController.h"
 #include "LabPlayerState.h"
-#include "Unreal4LabPlayerController.h"
+#include "LabPlayerController.h"
 #include "LabPawn.h"
 
 
@@ -103,7 +103,7 @@ void ALabPlayerProxy::Tick(float DeltaTime)
 	}
 }
 
-void ALabPlayerProxy::MoveToLocation(const AUnreal4LabPlayerController* controller, const FVector& DestLocation)
+void ALabPlayerProxy::MoveToLocation(const ALabPlayerController* controller, const FVector& DestLocation)
 {
 	/** Looks easy - doesn't it.
 	*  What this does is to engage the AI to pathfind.

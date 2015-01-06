@@ -38,7 +38,7 @@ class UNREAL4LAB_API ALabPlayerProxy : public APawn
 	void Tick(float DeltaTime);
 
 	// Used by the controller to get moving to work 
-	void MoveToLocation(const class AUnreal4LabPlayerController* controller, const FVector& vector);
+	void MoveToLocation(const class ALabPlayerController* controller, const FVector& vector);
 
 protected:
 	uint32 bSetTeamNum : 1;

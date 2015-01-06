@@ -1,10 +1,10 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/PlayerController.h"
-#include "Unreal4LabPlayerController.generated.h"
+#include "LabPlayerController.generated.h"
 
 UCLASS()
-class AUnreal4LabPlayerController : public APlayerController
+class ALabPlayerController : public APlayerController
 {
 	GENERATED_UCLASS_BODY()
 

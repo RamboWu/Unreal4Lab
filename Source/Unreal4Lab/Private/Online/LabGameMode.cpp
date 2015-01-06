@@ -2,7 +2,7 @@
 
 #include "Unreal4Lab.h"
 #include "LabGameMode.h"
-#include "Unreal4LabPlayerController.h"
+#include "LabPlayerController.h"
 #include "LabPlayerProxy.h"
 #include "LabHero.h"
 #include "LabPlayerState.h"
@@ -11,7 +11,7 @@ ALabGameMode::ALabGameMode(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
 	// use our custom PlayerController class
-	PlayerControllerClass = AUnreal4LabPlayerController::StaticClass();
+	PlayerControllerClass = ALabPlayerController::StaticClass();
 
 	DefaultPawnClass = ALabPlayerProxy::StaticClass();
 	PlayerStateClass = ALabPlayerState::StaticClass();
