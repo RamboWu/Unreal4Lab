@@ -4,10 +4,15 @@
 #include "LabPawnReplicationInfo.h"
 
 
-ALabPawnReplicationInfo::ALabPawnReplicationInfo(const class FPostConstructInitializeProperties& PCIP)
+ULabPawnReplicationInfo::ULabPawnReplicationInfo(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-
+	//bReplicates = true;
 }
 
-
+void ULabPawnReplicationInfo::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ULabPawnReplicationInfo, HealthMax);
+	DOREPLIFETIME(ULabPawnReplicationInfo, HealthRegenerationAmount);
+}

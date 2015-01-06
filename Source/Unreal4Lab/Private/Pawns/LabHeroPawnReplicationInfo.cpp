@@ -4,7 +4,7 @@
 #include "LabHeroPawnReplicationInfo.h"
 
 
-ALabHeroPawnReplicationInfo::ALabHeroPawnReplicationInfo(const class FPostConstructInitializeProperties& PCIP)
+ULabHeroPawnReplicationInfo::ULabHeroPawnReplicationInfo(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
 

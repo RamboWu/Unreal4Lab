@@ -40,7 +40,11 @@ class UNREAL4LAB_API ALabPawn : public ACharacter, public ILabTeamInterface, pub
 	void Client_PlayMeleeAnim();
 
 
+	//UPROPERTY(BlueprintReadOnly, Replicated, Category = State)
+	class ULabPawnReplicationInfo* PawnReplicationInfo;
 
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	/** melee anim */
@@ -57,10 +61,10 @@ protected:
 
 	/*base health*/
 	UPROPERTY(EditAnywhere, Category = State)
-	uint32 m_base_health;
+	uint32 BaseHealth;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = State)
-	uint32 m_health;
+	uint32 Health;
 
 	/*base attack range*/
 	UPROPERTY(EditAnywhere, Category = State)
@@ -68,4 +72,15 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = State)
 	uint32 m_base_sight_distance;
+
+	class ULabStatsModifier* StatsModifier;
+
+	uint32 JustSpawned:1;
+
+	/**
+	* Recalculate the pawn stat
+	*
+	* @network		Server
+	*/
+	void RecalculateStats();
 };

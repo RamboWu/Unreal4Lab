@@ -9,7 +9,7 @@
  * 
  */
 UCLASS()
-class UNREAL4LAB_API ALabUnitPawnReplicationInfo : public ALabPawnReplicationInfo
+class UNREAL4LAB_API ULabUnitPawnReplicationInfo : public ULabPawnReplicationInfo
 {
 	GENERATED_UCLASS_BODY()
 

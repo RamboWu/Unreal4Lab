@@ -2,26 +2,29 @@
 
 #include "Unreal4Lab.h"
 #include "LabBlueprintLibrary.h"
+#include "LabPawnReplicationInfo.h"
+#include "LabStatsModifier.h"
 #include "LabPawn.h"
 
 
 ALabPawn::ALabPawn(const class FPostConstructInitializeProperties& PCIP)
-	: Super(PCIP), m_base_health(100), m_health(100), m_base_attack_range(100), m_base_sight_distance(300)
+	: Super(PCIP), 
+	BaseHealth(100),
+	Health(0),
+	m_base_attack_range(100), 
+	m_base_sight_distance(300)
 {
 	bReplicates = true;
-
-	//SensingComponent = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("SensingComponent"));
-	//SensingComponent->OnComponentBeginOverlap.AddDynamic(this, &ALabPawn::OnBeginOverlap);
-	//SensingComponent->OnComponentEndOverlap.AddDynamic(this, &ALabPawn::OnEndOverlap);
-	//SensingComponent->AttachTo(RootComponent);
-
+	JustSpawned = true;
+	
 }
 
 void ALabPawn::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ALabPawn, m_team_num);
-	DOREPLIFETIME(ALabPawn, m_health);
+	DOREPLIFETIME(ALabPawn, Health);
+	//DOREPLIFETIME(ALabPawn, PawnReplicationInfo);
 }
 
 uint8 ALabPawn::GetTeamNum() const
@@ -36,17 +39,17 @@ void ALabPawn::SetTeamNum(uint8 NewTeamNum)
 
 uint32 ALabPawn::GetHealth()
 {
-	return m_health;
+	return Health;
 }
 
 float ALabPawn::GetHealthPercentage()
 {
-	return ((float)m_health / GetMaxHealth());
+	return ((float)Health / GetMaxHealth());
 }
 
 uint32 ALabPawn::GetMaxHealth()
 {
-	return m_base_health;
+	return BaseHealth;
 }
 
 uint32 ALabPawn::GetAttackRange() const
@@ -57,11 +60,9 @@ uint32 ALabPawn::GetAttackRange() const
 void ALabPawn::Client_PlayMeleeAnim_Implementation()
 {
 
-	if ((m_health > 0.f) && MeleeAnim)
+	if ((Health > 0.f) && MeleeAnim)
 	{
-		
 		float duration = PlayAnimMontage(MeleeAnim);
-
 	}
 }
 
@@ -69,34 +70,66 @@ uint32 ALabPawn::GetSightDistance()
 {
 	return m_base_sight_distance;
 }
-/*
-void ALabPawn::OnBeginOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+
+
+void ALabPawn::Tick(float DeltaTime)
 {
-	ILabTeamInterface* team_interface = InterfaceCast<ILabTeamInterface>(OtherActor);
+	Super::Tick(DeltaTime);
 
-	if (team_interface){
-		ALabPawn* target = Cast<ALabPawn>(OtherActor);
-		if (target)
+	if (HasAuthority())
+	{
+		// Recalculates the pawn stats
+		RecalculateStats();
+
+		// Update the health and mana
+		/*if (PawnReplicationInfo != NULL)
 		{
-			ULabBlueprintLibrary::printDebugInfo("add a target:");
-			//AllTargets.AddUnique(OtherActor);
-		}
+			Health = FMath::Min(float(PawnReplicationInfo->HealthMax), Health + (PawnReplicationInfo->HealthRegenerationAmount * DeltaTime));
+			//Mana = FMin(UDKMOBAPawnReplicationInfo.ManaMax, Mana + (UDKMOBAPawnReplicationInfo.ManaRegenerationAmount * DeltaTime));
+		}*/
+	}
 
+}
+
+void ALabPawn::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (HasAuthority())
+	{
+		PawnReplicationInfo = ConstructObject<ULabPawnReplicationInfo>(ULabPawnReplicationInfo::StaticClass(), this);
+		StatsModifier = ConstructObject<ULabStatsModifier>(ULabStatsModifier::StaticClass(), this);
 	}
 }
 
-void ALabPawn::OnEndOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex)
+
+void ALabPawn::RecalculateStats()
 {
-	ILabTeamInterface* team_interface = InterfaceCast<ILabTeamInterface>(OtherActor);
-	if (team_interface){
-		ALabPawn* target = Cast<ALabPawn>(OtherActor);
-		if (target)
-		{
-			ULabBlueprintLibrary::printDebugInfo("remove a target:");
-			//AllTargets.Remove(OtherActor);
-		}
+	if (!HasAuthority())
+		return;
+
+	/*if (StatsModifier == NULL)
+	{
+		return;
 	}
+
+	if (PawnReplicationInfo != NULL)
+	{
+		// MUST calc attributes first
+		//UDKMOBAPawnReplicationInfo.Strength = StatsModifier.CalculateStat(STATNAME_Strength);
+		//UDKMOBAPawnReplicationInfo.Agility = StatsModifier.CalculateStat(STATNAME_Agility);
+		//UDKMOBAPawnReplicationInfo.Intelligence = StatsModifier.CalculateStat(STATNAME_Intelligence);
+
+		// Now can go through the rest
+		//UDKMOBAPawnReplicationInfo.ManaMax = StatsModifier.CalculateStat(STATNAME_ManaMax, BaseMana);
+
+		//TODO
+		//PawnReplicationInfo->HealthMax = StatsModifier.CalculateStat(STATNAME_HPMax, BaseHealth);
+		// If just spawned, then set Mana  and Health to Max
+		if (JustSpawned)
+		{
+			JustSpawned = false;
+			Health = PawnReplicationInfo->HealthMax;
+		}
+	}*/
 }
-*/
