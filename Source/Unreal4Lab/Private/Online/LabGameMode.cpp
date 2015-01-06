@@ -4,7 +4,7 @@
 #include "LabGameMode.h"
 #include "Unreal4LabPlayerController.h"
 #include "LabPlayerProxy.h"
-#include "Unreal4LabCharacter.h"
+#include "LabHero.h"
 #include "LabPlayerState.h"
 
 ALabGameMode::ALabGameMode(const class FPostConstructInitializeProperties& PCIP) 

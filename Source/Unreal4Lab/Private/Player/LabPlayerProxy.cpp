@@ -40,7 +40,7 @@ ALabPlayerProxy::ALabPlayerProxy(const class FPostConstructInitializeProperties&
 
 	if (Role == ROLE_Authority)
 	{
-		static ConstructorHelpers::FObjectFinder<UClass> PlayerPawnBPClass(TEXT("/Game/Blueprints/MyCharacter.MyCharacter_C"));
+		static ConstructorHelpers::FObjectFinder<UClass> PlayerPawnBPClass(TEXT("/Game/Character/Doom/Blueprint/Doom.Doom_C"));
 		CharacterClass = PlayerPawnBPClass.Object;
 	}
 	bSetTeamNum = false;
