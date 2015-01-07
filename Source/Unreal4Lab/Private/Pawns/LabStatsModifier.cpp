@@ -62,7 +62,7 @@ void ULabStatsModifier::AddToBuffs(class ULabBuff* NewBuff)
 	int32 i;
 
 	// Attempt to insert the buff into the array; sorting on their Expiry time
-	for (i = 0; i < AllBuffs.Num(); ++i)
+	for (i = 0; i < AllBuffs.Num(); i++)
 	{
 		if (NewBuff->Expiry < AllBuffs[i]->Expiry)
 		{
@@ -84,9 +84,9 @@ float ULabStatsModifier::CalculateMultipliedChanges(EStatName StatName)
 
 	// Iterate through the stat changes and append to find the total modification
 
-	for (i = 0; i < AllBuffs.Num(); ++i)
+	for (i = 0; i < AllBuffs.Num(); i++)
 	{
-		for (j = 0; j < AllBuffs[i]->StatChanges.Num(); ++j)
+		for (j = 0; j < AllBuffs[i]->StatChanges.Num(); j++)
 		{
 			if (AllBuffs[i]->StatChanges[j].StatName == StatName && AllBuffs[i]->StatChanges[j].ModificationType == MODTYPE_Multiplication)
 			{
@@ -105,9 +105,9 @@ float ULabStatsModifier::CalculateAbsoluteChanges(EStatName StatName)
 	float TotalModification = 0;
 	int32 i, j;
 
-	for (i = 0; i < AllBuffs.Num(); ++i)
+	for (i = 0; i < AllBuffs.Num(); i++)
 	{
-		for (j = 0; j < AllBuffs[i]->StatChanges.Num(); ++j)
+		for (j = 0; j < AllBuffs[i]->StatChanges.Num(); j++)
 		{
 			if (AllBuffs[i]->StatChanges[j].StatName == StatName && AllBuffs[i]->StatChanges[j].ModificationType == MODTYPE_Addition)
 			{
@@ -125,9 +125,9 @@ float ULabStatsModifier::CalculateGrowthChanges(EStatName StatName)
 	float TotalModification = 0;
 	int32 i, j;
 
-	for (i = 0; i < AllBuffs.Num(); ++i)
+	for (i = 0; i < AllBuffs.Num(); i++)
 	{
-		for (j = 0; j < AllBuffs[i]->StatChanges.Num(); ++j)
+		for (j = 0; j < AllBuffs[i]->StatChanges.Num(); j++)
 		{
 			if (AllBuffs[i]->StatChanges[j].StatName == StatName && AllBuffs[i]->StatChanges[j].ModificationType == MODTYPE_Growth)
 			{
@@ -148,9 +148,9 @@ float ULabStatsModifier::CalculateChangesDiminishingly(EStatName StatName)
 	TotalModification = 1.f;
 
 	// Iterate through the stat changes and append to find the total modification
-	for (i = 0; i < AllBuffs.Num(); ++i)
+	for (i = 0; i < AllBuffs.Num(); i++)
 	{
-		for (j = 0; j < AllBuffs[i]->StatChanges.Num(); ++j)
+		for (j = 0; j < AllBuffs[i]->StatChanges.Num(); j++)
 		{
 			if (AllBuffs[i]->StatChanges[j].StatName == StatName)
 			{
@@ -170,9 +170,9 @@ float ULabStatsModifier::FindSmallestChange(EStatName StatName, EModifierType Mo
 	int32 i, j;
 
 	// Find the smallest modification
-	for (i = 0; i < AllBuffs.Num(); ++i)
+	for (i = 0; i < AllBuffs.Num(); i++)
 	{
-		for (j = 0; j < AllBuffs[i]->StatChanges.Num(); ++j)
+		for (j = 0; j < AllBuffs[i]->StatChanges.Num(); j++)
 		{
 			if (AllBuffs[i]->StatChanges[j].StatName == StatName && AllBuffs[i]->StatChanges[j].ModificationType == ModificationType)
 			{
@@ -213,9 +213,9 @@ float ULabStatsModifier::FindLargestChange(EStatName StatName, EModifierType Mod
 	int32 i, j;
 
 	// Find the largest modification
-	for (i = 0; i < AllBuffs.Num(); ++i)
+	for (i = 0; i < AllBuffs.Num(); i++)
 	{
-		for (j = 0; j < AllBuffs[i]->StatChanges.Num(); ++j)
+		for (j = 0; j < AllBuffs[i]->StatChanges.Num(); j++)
 		{
 			if (AllBuffs[i]->StatChanges[j].StatName == StatName && AllBuffs[i]->StatChanges[j].ModificationType == ModificationType)
 			{
@@ -254,9 +254,9 @@ void ULabStatsModifier::CalculateAssignedChanges(EStatName StatName, float &Prev
 
 	if (AllBuffs.Num() > 0)
 	{
-		for (i = 0; i < AllBuffs.Num(); ++i)
+		for (i = 0; i < AllBuffs.Num(); i++)
 		{
-			for (j = 0; j < AllBuffs[i]->StatChanges.Num(); ++j)
+			for (j = 0; j < AllBuffs[i]->StatChanges.Num(); j++)
 			{
 				if (AllBuffs[i]->StatChanges[j].StatName == StatName && AllBuffs[i]->StatChanges[j].ModificationType == MODTYPE_Assignment)
 				{

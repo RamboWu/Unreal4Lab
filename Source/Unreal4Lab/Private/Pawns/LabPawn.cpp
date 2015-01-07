@@ -129,6 +129,7 @@ void ALabPawn::RecalculateStats()
 		{
 			JustSpawned = false;
 			Health = PawnReplicationInfo->HealthMax;
+			//ULabBlueprintLibrary::printDebugInfo("Set "+ GetName() + "'s health = "+FString::FromInt(Health));
 		}
 	}
 }

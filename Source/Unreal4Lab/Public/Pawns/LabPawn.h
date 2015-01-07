@@ -61,21 +61,21 @@ protected:
 
 	/*base health*/
 	UPROPERTY(EditAnywhere, Category = State)
-	uint32 BaseHealth;
+	int32 BaseHealth;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = State)
-	uint32 Health;
+	int32 Health;
 
 	/*base attack range*/
 	UPROPERTY(EditAnywhere, Category = State)
-	uint32 m_base_attack_range;
+	int32 m_base_attack_range;
 
 	UPROPERTY(EditAnywhere, Category = State)
-	uint32 m_base_sight_distance;
+	int32 m_base_sight_distance;
 
 	class ULabStatsModifier* StatsModifier;
 
-	uint32 JustSpawned:1;
+	int32 JustSpawned:1;
 
 	/**
 	* Recalculate the pawn stat
