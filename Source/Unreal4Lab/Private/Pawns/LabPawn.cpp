@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Unreal4Lab.h"
+#include "LabGameMode.h"
 #include "LabBlueprintLibrary.h"
 #include "LabPawnReplicationInfo.h"
 #include "LabStatsModifier.h"
@@ -11,8 +12,9 @@ ALabPawn::ALabPawn(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP), 
 	BaseHealth(100),
 	Health(0),
-	m_base_attack_range(100), 
-	m_base_sight_distance(300)
+	BaseAttackDistance(100),
+	BaseSightDistance(300),
+	BaseDamage(30)
 {
 	bReplicates = true;
 	JustSpawned = true;
@@ -54,7 +56,7 @@ uint32 ALabPawn::GetMaxHealth()
 
 uint32 ALabPawn::GetAttackRange() const
 {
-	return m_base_attack_range;
+	return BaseAttackDistance;
 }
 
 void ALabPawn::Client_PlayMeleeAnim_Implementation()
@@ -68,7 +70,7 @@ void ALabPawn::Client_PlayMeleeAnim_Implementation()
 
 uint32 ALabPawn::GetSightDistance()
 {
-	return m_base_sight_distance;
+	return BaseSightDistance;
 }
 
 
@@ -124,6 +126,7 @@ void ALabPawn::RecalculateStats()
 		//UDKMOBAPawnReplicationInfo.ManaMax = StatsModifier.CalculateStat(STATNAME_ManaMax, BaseMana);
 
 		PawnReplicationInfo->HealthMax = StatsModifier->CalculateStat(STATNAME_HPMax, BaseHealth);
+		PawnReplicationInfo->Damage = StatsModifier->CalculateStat(STATNAME_Damage, BaseDamage);
 		// If just spawned, then set Mana  and Health to Max
 		if (JustSpawned)
 		{
@@ -132,4 +135,47 @@ void ALabPawn::RecalculateStats()
 			//ULabBlueprintLibrary::printDebugInfo("Set "+ GetName() + "'s health = "+FString::FromInt(Health));
 		}
 	}
+}
+
+float ALabPawn::GetDamage() const
+{
+	return PawnReplicationInfo->Damage;
+}
+
+float ALabPawn::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
+{
+	//Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	ULabBlueprintLibrary::printDebugInfo("Got damage=" + FString::SanitizeFloat(DamageAmount) + "from" + DamageCauser->GetName());
+
+	if (Health <= 0.f)
+	{
+		// no further damage if already dead
+		return 0.f;
+	}
+
+	// Modify based on game rules.
+	ALabGameMode* const Game = GetWorld()->GetAuthGameMode<ALabGameMode>();
+	DamageAmount = Game ? Game->ModifyDamage(DamageAmount, this, DamageEvent, EventInstigator, DamageCauser) : 0.f;
+
+	const float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	if (ActualDamage > 0.f)
+	{
+		Health -= ActualDamage;
+		if (Health <= 0.f)
+		{
+			//Die(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
+		}
+
+		// broadcast AI-detectable noise
+		//MakeNoise(1.0f, EventInstigator ? EventInstigator->GetPawn() : this);
+
+		// our gamestate wants to know when damage happens
+		/*AStrategyGameState* const GameState = GetWorld()->GetGameState<AStrategyGameState>();
+		if (GameState)
+		{
+			GameState->OnActorDamaged(this, ActualDamage, EventInstigator);
+		}*/
+	}
+
+	return ActualDamage;
 }

@@ -17,4 +17,5 @@ void ULabPawnReplicationInfo::GetLifetimeReplicatedProps(TArray< FLifetimeProper
 	DOREPLIFETIME(ULabPawnReplicationInfo, HealthMax);
 	DOREPLIFETIME(ULabPawnReplicationInfo, HealthRegenerationAmount);
 	DOREPLIFETIME(ULabPawnReplicationInfo, Level);
+	DOREPLIFETIME(ULabPawnReplicationInfo, Damage);
 }

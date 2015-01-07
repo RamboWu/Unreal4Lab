@@ -4,6 +4,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "LabPawnReplicationInfo.h"
 #include "LabRobot.h"
 #include "LabGameMode.h"
 #include "LabAIRoute.h"
@@ -178,6 +179,10 @@ void ALabAIController::Attack()
 			if (!bMovingToTarget)
 			{
 				self_pawn->Client_PlayMeleeAnim();
+
+				FDamageEvent damage_event;
+				enemey->TakeDamage(self_pawn->PawnReplicationInfo->Damage, damage_event, this, self_pawn);
+				//UGameplayStatics::ApplyDamage(enemey, self_pawn->GetDamage(), Instigator, self_pawn);
 				MeleeAttackAnimationEndTime = GetWorld()->GetTimeSeconds() + 1.f;
 				bIsPlayingAnimation = true;
 			}

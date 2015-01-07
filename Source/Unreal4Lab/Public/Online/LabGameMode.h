@@ -32,6 +32,19 @@ class ALabGameMode : public AGameMode
 	*/
 	static bool OnEnemyTeam(const AActor* ActorA, const AActor* ActorB);
 
+	/**
+	* Modify the damage we want to apply to an actor. 怎么造成魔法伤害，怎么闪避，都是在GameMode里定义
+	*
+	* @param Damage			The damage
+	* @param DamagedActor		The actor we wish to damage
+	* @param DamageEvent		The event that caused the damage
+	* @param EventInstigator
+	* @param DamageCauser
+	*
+	* @returns The adjusted damage amount
+	*/
+	virtual float ModifyDamage(float Damage, AActor* DamagedActor, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const;
+
 protected:
 	/** check if player can use spawnpoint */
 	virtual bool IsSpawnpointAllowed(APlayerStart* SpawnPoint, AController* Player) const;

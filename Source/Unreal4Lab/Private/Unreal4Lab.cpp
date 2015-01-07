@@ -6,4 +6,4 @@
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Unreal4Lab, "Unreal4Lab" );
 
 DEFINE_LOG_CATEGORY(LogUnreal4Lab)
- 
+DEFINE_LOG_CATEGORY(LogLab)

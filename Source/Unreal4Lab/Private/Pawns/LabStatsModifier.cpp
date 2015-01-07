@@ -8,7 +8,7 @@
 ULabStatsModifier::ULabStatsModifier(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-
+	AllBuffs.Empty();
 }
 
 
@@ -125,10 +125,15 @@ float ULabStatsModifier::CalculateGrowthChanges(EStatName StatName)
 	float TotalModification = 0;
 	int32 i, j;
 
+	if (AllBuffs.Num() <= 0)
+		return TotalModification;
+
 	for (i = 0; i < AllBuffs.Num(); i++)
 	{
 		for (j = 0; j < AllBuffs[i]->StatChanges.Num(); j++)
 		{
+			
+			UE_LOG(LogLab, Log, TEXT("CalculateGrowthChanges: i is %d, j is %d"), i , j);
 			if (AllBuffs[i]->StatChanges[j].StatName == StatName && AllBuffs[i]->StatChanges[j].ModificationType == MODTYPE_Growth)
 			{
 				TotalModification += AllBuffs[i]->StatChanges[j].Modification;

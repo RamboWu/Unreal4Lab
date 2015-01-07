@@ -5,6 +5,7 @@
 #include "LabTypes.h"
 #include "LabTeamInterface.h"
 #include "LabStateInterface.h"
+#include "LabAttackInterface.h"
 #include "GameFramework/Character.h"
 #include "LabPawn.generated.h"
 
@@ -12,7 +13,8 @@
  * 
  */
 UCLASS()
-class UNREAL4LAB_API ALabPawn : public ACharacter, public ILabTeamInterface, public ILabStateInterface
+class UNREAL4LAB_API ALabPawn : public ACharacter, 
+	public ILabTeamInterface, public ILabStateInterface, public ILabAttackInterface
 {
 	GENERATED_UCLASS_BODY()
 
@@ -30,21 +32,22 @@ class UNREAL4LAB_API ALabPawn : public ACharacter, public ILabTeamInterface, pub
 	virtual uint32 GetAttackRange() const override;
 
 	virtual uint32 GetSightDistance() override;
+
+	virtual float GetDamage() const override;
 	/*ILabStateInterface end*/
 
 	/** set team number */
 	void SetTeamNum(uint8 NewTeamNum);
 
-
 	UFUNCTION(NetMulticast, Unreliable)
 	void Client_PlayMeleeAnim();
-
 
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = State)
 	class ULabPawnReplicationInfo* PawnReplicationInfo;
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 
 protected:
 	/** melee anim */
@@ -59,19 +62,24 @@ protected:
 	UPROPERTY(EditAnywhere, Replicated,  Category = State)
 	TEnumAsByte<ELabTeam::Type> m_team_num;
 
-	/*base health*/
-	UPROPERTY(EditAnywhere, Category = State)
-	int32 BaseHealth;
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = State)
 	int32 Health;
 
+	/*base health*/
+	UPROPERTY(EditAnywhere, Category = State)
+	int32 BaseHealth;
+
 	/*base attack range*/
 	UPROPERTY(EditAnywhere, Category = State)
-	int32 m_base_attack_range;
+	int32 BaseAttackDistance;
 
 	UPROPERTY(EditAnywhere, Category = State)
-	int32 m_base_sight_distance;
+	int32 BaseSightDistance;
+
+	UPROPERTY(EditAnywhere, Category = State)
+	int32 BaseDamage;
 
 	class ULabStatsModifier* StatsModifier;
 
@@ -83,4 +91,6 @@ protected:
 	* @network		Server
 	*/
 	void RecalculateStats();
+
+
 };

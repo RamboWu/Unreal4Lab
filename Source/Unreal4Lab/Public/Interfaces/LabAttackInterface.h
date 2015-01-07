@@ -20,25 +20,25 @@ class ILabAttackInterface
 	* @param		Attacker		Actor that wants to attack this UDKMOBAAttackInterface
 	* @return						Returns the attacking priority that this implementing actor belongs to
 	*/
-	virtual uint32 GetAttackPriority(AActor Attacker) const = 0;
+	virtual uint32 GetAttackPriority(AActor Attacker) const;
 	/**
 	* Returns the enemy
 	*
 	* @return		Returns the current enemy
 	*/
-	virtual AActor GetEnemy() const = 0;
+	virtual class AActor* GetEnemy() const;
 	/**
 	* Returns true if the actor is still valid to attack
 	*
 	* @return		Returns true if the actor is still valid to attack
 	*/
-	virtual bool IsValidToAttack() const = 0;
+	virtual bool IsValidToAttack() const;
 	/**
 	* Returns the amount of damage that this actor does for an attack. NOT used for spells.
 	*
 	* @return		The amount of damage done, with Blind taken account of.
 	*/
-	virtual float GetDamage() const = 0;
+	virtual float GetDamage() const;
 	/**
 	* Returns the amount of damage that this actor does for an attack.
 	*

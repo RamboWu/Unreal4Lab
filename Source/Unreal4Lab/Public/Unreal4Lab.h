@@ -7,6 +7,6 @@
 #include "Net/UnrealNetwork.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogUnreal4Lab, Log, All);
-
+DECLARE_LOG_CATEGORY_EXTERN(LogLab, Log, All);
 
 #endif

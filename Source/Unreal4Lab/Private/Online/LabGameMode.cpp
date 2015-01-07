@@ -134,3 +134,37 @@ bool ALabGameMode::OnEnemyTeam(const AActor* ActorA, const AActor* ActorB)
 
 	return (TeamA != NULL) && (TeamB != NULL) && (TeamA->GetTeamNum() != TeamB->GetTeamNum());
 }
+
+float ALabGameMode::ModifyDamage(float Damage, AActor* DamagedActor, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const
+{
+	// no health changes after game is finished
+	/*if (GetGameplayState() == EGameplayState::Finished)
+	{
+		return 0.0f;
+	}
+
+	if (Damage > 0.f)
+	{
+		const IStrategyTeamInterface* VictimTeam = InterfaceCast<IStrategyTeamInterface>(DamagedActor);
+		IStrategyTeamInterface* InstigatorTeam = InterfaceCast<IStrategyTeamInterface>(EventInstigator);
+		if (InstigatorTeam == NULL)
+		{
+			InstigatorTeam = InterfaceCast<IStrategyTeamInterface>(DamageCauser);
+		}
+
+		// skip friendly fire
+		if (InstigatorTeam && VictimTeam && InstigatorTeam->GetTeamNum() == VictimTeam->GetTeamNum())
+		{
+			return 0.0f;
+		}
+
+		// pawn's damage reduction
+		const AStrategyChar* DamagedChar = Cast<AStrategyChar>(DamagedActor);
+		if (DamagedChar)
+		{
+			Damage -= DamagedChar->GetPawnData()->DamageReduction;
+		}
+	}*/
+
+	return Damage;
+}
