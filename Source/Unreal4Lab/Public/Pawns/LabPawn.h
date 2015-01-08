@@ -18,7 +18,10 @@ class UNREAL4LAB_API ALabPawn : public ACharacter,
 {
 	GENERATED_UCLASS_BODY()
 
-	
+	/** Identifies if pawn is in its dying state */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health)
+	uint32 bIsDying : 1;
+
 	/*ILabStateInterface begin*/
 	virtual uint8 GetTeamNum() const override;
 
@@ -42,12 +45,25 @@ class UNREAL4LAB_API ALabPawn : public ACharacter,
 	UFUNCTION(NetMulticast, Unreliable)
 	void Client_PlayMeleeAnim();
 
+	UFUNCTION(NetMulticast, Unreliable)
+	void Client_PlayDeathAnim();
+
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = State)
 	class ULabPawnReplicationInfo* PawnReplicationInfo;
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
+
+	/**
+	* Kills pawn.
+	* @param KillingDamage - Damage amount of the killing blow
+	* @param DamageEvent - Damage event of the killing blow
+	* @param Killer - Who killed this pawn
+	* @param DamageCauser - the Actor that directly caused the damage (i.e. the Projectile that exploded, the Weapon that fired, etc)
+	* @returns true if allowed
+	*/
+	virtual void Die(float KillingDamage, struct FDamageEvent const& DamageEvent, class AController* Killer, class AActor* DamageCauser);
 
 protected:
 	/** melee anim */
@@ -93,5 +109,6 @@ protected:
 	*/
 	void RecalculateStats();
 
-
+	/** event called after die animation  to hide character and delete it asap */
+	void OnDieAnimationEnd();
 };

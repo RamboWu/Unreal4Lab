@@ -23,7 +23,7 @@ class UNREAL4LAB_API ALabAIFactory : public AActor
 	float SpawnInterval;
 
 	UPROPERTY(EditAnywhere, Category = AIFactory)
-	uint32 SpawnNum;
+	int32 SpawnNum;
 
 	UPROPERTY(EditAnywhere, Category = AIFactory)
 	class ALabAIRoute* Route;

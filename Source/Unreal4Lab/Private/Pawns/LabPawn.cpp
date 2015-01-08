@@ -19,7 +19,7 @@ ALabPawn::ALabPawn(const class FPostConstructInitializeProperties& PCIP)
 {
 	bReplicates = true;
 	JustSpawned = true;
-	
+	bIsDying = false;
 }
 
 void ALabPawn::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -66,6 +66,14 @@ void ALabPawn::Client_PlayMeleeAnim_Implementation()
 	if ((Health > 0.f) && MeleeAnim)
 	{
 		float duration = PlayAnimMontage(MeleeAnim);
+	}
+}
+
+void ALabPawn::Client_PlayDeathAnim_Implementation()
+{
+	if (DeathAnim)
+	{
+		float duration = PlayAnimMontage(DeathAnim);
 	}
 }
 
@@ -171,11 +179,11 @@ float ALabPawn::TakeDamage(float DamageAmount, struct FDamageEvent const& Damage
 		Health -= ActualDamage;
 		if (Health <= 0.f)
 		{
-			//Die(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
+			Die(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
 		}
 
 		// broadcast AI-detectable noise
-		//MakeNoise(1.0f, EventInstigator ? EventInstigator->GetPawn() : this);
+		MakeNoise(1.0f, EventInstigator ? EventInstigator->GetPawn() : this);
 
 		// our gamestate wants to know when damage happens
 		/*AStrategyGameState* const GameState = GetWorld()->GetGameState<AStrategyGameState>();
@@ -186,4 +194,83 @@ float ALabPawn::TakeDamage(float DamageAmount, struct FDamageEvent const& Damage
 	}
 
 	return ActualDamage;
+}
+
+void ALabPawn::Die(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser)
+{
+	if (bIsDying										// already dying
+		|| IsPendingKill()								// already destroyed
+		|| GetWorld()->GetAuthGameMode() == NULL
+		|| GetWorld()->GetAuthGameMode()->GetMatchState() == MatchState::LeavingMap)	// level transition occurring
+	{
+		return;
+	}
+
+	bIsDying = true;
+	//Health = FMath::Min(0.0f, Health);
+
+	// figure out who killed us
+	UDamageType const* const DamageType = DamageEvent.DamageTypeClass ?
+		Cast<const UDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject())
+		: GetDefault<UDamageType>();
+	Killer = GetDamageInstigator(Killer, *DamageType);
+
+	// forcibly end any timers that may be in flight
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+
+	// notify the game mode if an Enemy dies
+	/*if (GetTeamNum() == EStrategyTeam::Enemy)
+	{
+		AStrategyGameState* const GameState = GetWorld()->GetGameState<AStrategyGameState>();
+		if (GameState)
+		{
+			GameState->OnCharDied(this);
+		}
+	}*/
+
+	// disable any AI
+	/*AStrategyAIController* const AIController = Cast<AStrategyAIController>(Controller);
+	if (AIController)
+	{
+		AIController->EnableLogic(false);
+	}*/
+
+	// turn off collision
+	if (CapsuleComponent.IsValid())
+	{
+		CapsuleComponent->BodyInstance.SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		CapsuleComponent->BodyInstance.SetResponseToChannel(ECC_Pawn, ECR_Ignore);
+		CapsuleComponent->BodyInstance.SetResponseToChannel(ECC_PhysicsBody, ECR_Ignore);
+	}
+
+	// turn off movement
+	if (CharacterMovement)
+	{
+		CharacterMovement->StopMovementImmediately();
+		CharacterMovement->DisableMovement();
+	}
+
+	// detach the controller
+	if (Controller != NULL)
+	{
+		Controller->UnPossess();
+	}
+
+	// play death animation
+	float DeathAnimDuration = 2.f;
+	if (DeathAnim)
+	{
+		Client_PlayDeathAnim();
+		//DeathAnimDuration = PlayAnimMontage(DeathAnim) / (Mesh.IsValid() && Mesh->GlobalAnimRateScale > 0 ? Mesh->GlobalAnimRateScale : 1);
+		//UAnimInstance * AnimInstance = (Mesh) ? Mesh->GetAnimInstance() : NULL;
+	}
+	ULabBlueprintLibrary::printDebugInfo("Death Animation Duration=" + FString::SanitizeFloat(DeathAnimDuration));
+	GetWorldTimerManager().SetTimer(this, &ALabPawn::OnDieAnimationEnd, DeathAnimDuration + 0.01, false);
+}
+
+void ALabPawn::OnDieAnimationEnd()
+{
+	this->SetActorHiddenInGame(true);
+	// delete the pawn asap
+	SetLifeSpan(0.01f);
 }
