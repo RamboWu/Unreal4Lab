@@ -8,12 +8,12 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(hideCategories = (Rendering, Input, Actor, Base, Collision, Shape, Transform, Object, Tags, Blueprint))
 class UNREAL4LAB_API ALabRobot : public ALabPawn
 {
 	GENERATED_UCLASS_BODY()
 
-	UPROPERTY(EditAnywhere, Category = Behavior)
+	UPROPERTY(EditAnywhere, Category = AI)
 	class UBehaviorTree * BotBehavior;
 	
 };

@@ -19,7 +19,7 @@ ALabPawn::ALabPawn(const class FPostConstructInitializeProperties& PCIP)
 {
 	bReplicates = true;
 	JustSpawned = true;
-
+	
 }
 
 void ALabPawn::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const

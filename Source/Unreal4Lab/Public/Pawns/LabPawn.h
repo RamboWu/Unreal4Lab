@@ -51,12 +51,12 @@ class UNREAL4LAB_API ALabPawn : public ACharacter,
 
 protected:
 	/** melee anim */
-	UPROPERTY(EditDefaultsOnly, Category = Pawn)
-	UAnimMontage* MeleeAnim;
+	UPROPERTY(EditDefaultsOnly, Category = View)
+	class UAnimMontage* MeleeAnim;
 
 	/** death anim */
-	UPROPERTY(EditDefaultsOnly, Category = Pawn)
-	UAnimMontage* DeathAnim;
+	UPROPERTY(EditDefaultsOnly, Category = View)
+	class UAnimMontage* DeathAnim;
 
 	/*team num*/
 	UPROPERTY(EditAnywhere, Replicated,  Category = State)
