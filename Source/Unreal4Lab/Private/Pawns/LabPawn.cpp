@@ -14,11 +14,12 @@ ALabPawn::ALabPawn(const class FPostConstructInitializeProperties& PCIP)
 	Health(0),
 	BaseAttackDistance(100),
 	BaseSightDistance(300),
-	BaseDamage(30)
+	BaseDamage(30),
+	StatsModifier(NULL)
 {
 	bReplicates = true;
 	JustSpawned = true;
-	
+
 }
 
 void ALabPawn::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -99,8 +100,15 @@ void ALabPawn::BeginPlay()
 
 	if (HasAuthority())
 	{
+		UE_LOG(LogLab, Log, TEXT("ALabPawn::BeginPlay()"));
 		PawnReplicationInfo = ConstructObject<ULabPawnReplicationInfo>(ULabPawnReplicationInfo::StaticClass(), this);
 		StatsModifier = ConstructObject<ULabStatsModifier>(ULabStatsModifier::StaticClass(), this);
+		if (StatsModifier)
+		{
+			//StatsModifier->AddStatChange(STATNAME_HPMax, 10, MODTYPE_Growth, 0.f, true);
+			//StatsModifier.AddStatChange(STATNAME_Agility, BaseAgility, MODTYPE_Addition, 0.f, true);
+			//StatsModifier.AddStatChange(STATNAME_Intelligence, BaseIntelligence, MODTYPE_Addition, 0.f, true);
+		}
 	}
 }
 
@@ -128,11 +136,11 @@ void ALabPawn::RecalculateStats()
 		PawnReplicationInfo->HealthMax = StatsModifier->CalculateStat(STATNAME_HPMax, BaseHealth);
 		PawnReplicationInfo->Damage = StatsModifier->CalculateStat(STATNAME_Damage, BaseDamage);
 		// If just spawned, then set Mana  and Health to Max
+
 		if (JustSpawned)
 		{
 			JustSpawned = false;
 			Health = PawnReplicationInfo->HealthMax;
-			//ULabBlueprintLibrary::printDebugInfo("Set "+ GetName() + "'s health = "+FString::FromInt(Health));
 		}
 	}
 }

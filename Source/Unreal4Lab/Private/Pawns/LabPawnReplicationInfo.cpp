@@ -8,7 +8,7 @@ ULabPawnReplicationInfo::ULabPawnReplicationInfo(const class FPostConstructIniti
 	: Super(PCIP),
 	Level(1)
 {
-	//bReplicates = true;
+
 }
 
 void ULabPawnReplicationInfo::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const

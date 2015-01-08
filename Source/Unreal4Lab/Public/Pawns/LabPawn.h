@@ -81,6 +81,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = State)
 	int32 BaseDamage;
 
+	UPROPERTY()
 	class ULabStatsModifier* StatsModifier;
 
 	int32 JustSpawned:1;

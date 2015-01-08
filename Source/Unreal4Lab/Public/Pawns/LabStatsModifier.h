@@ -125,4 +125,6 @@ protected:
 	* Apply any caps to the range of a stat AFTER locks (assignments) - stops stats from being invalid values.
 	*/
 	void CalculateFinalCaps(EStatName StatName, float &PreviousValue);
+
+
 };

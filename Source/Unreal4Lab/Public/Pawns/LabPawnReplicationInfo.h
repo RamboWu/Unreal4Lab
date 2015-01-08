@@ -25,4 +25,5 @@ class UNREAL4LAB_API ULabPawnReplicationInfo : public UObject
 
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = State)
 	int32 Damage;
+
 };
