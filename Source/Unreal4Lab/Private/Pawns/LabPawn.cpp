@@ -28,6 +28,7 @@ void ALabPawn::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifet
 	DOREPLIFETIME(ALabPawn, m_team_num);
 	DOREPLIFETIME(ALabPawn, Health);
 	DOREPLIFETIME(ALabPawn, PawnReplicationInfo);
+	DOREPLIFETIME(ALabPawn, LastTakeHitInfo);
 }
 
 uint8 ALabPawn::GetTeamNum() const
@@ -144,7 +145,7 @@ float ALabPawn::GetDamage() const
 float ALabPawn::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
 {
 	//Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	ULabBlueprintLibrary::printDebugInfo("Got damage=" + FString::SanitizeFloat(DamageAmount) + "from" + DamageCauser->GetName());
+	//ULabBlueprintLibrary::printDebugInfo("Got damage=" + FString::SanitizeFloat(DamageAmount) + "from" + DamageCauser->GetName());
 
 	if (Health <= 0.f)
 	{
@@ -164,11 +165,14 @@ float ALabPawn::TakeDamage(float DamageAmount, struct FDamageEvent const& Damage
 		{
 			Die(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
 		}
-
+		else
+		{
+			PlayHit(ActualDamage, DamageEvent, EventInstigator ? EventInstigator->GetPawn() : NULL, DamageCauser);
+		}
 		// broadcast AI-detectable noise
 		MakeNoise(1.0f, EventInstigator ? EventInstigator->GetPawn() : this);
 
-		// our gamestate wants to know when damage happens
+		// If our gamestate wants to know when damage happens
 		/*AStrategyGameState* const GameState = GetWorld()->GetGameState<AStrategyGameState>();
 		if (GameState)
 		{
@@ -179,90 +183,6 @@ float ALabPawn::TakeDamage(float DamageAmount, struct FDamageEvent const& Damage
 	return ActualDamage;
 }
 
-void ALabPawn::Die(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser)
-{
-	if (bIsDying										// already dying
-		|| IsPendingKill()								// already destroyed
-		|| GetWorld()->GetAuthGameMode() == NULL
-		|| GetWorld()->GetAuthGameMode()->GetMatchState() == MatchState::LeavingMap)	// level transition occurring
-	{
-		return;
-	}
-
-	bIsDying = true;
-	//Health = FMath::Min(0.0f, Health);
-
-	// figure out who killed us
-	UDamageType const* const DamageType = DamageEvent.DamageTypeClass ?
-		Cast<const UDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject())
-		: GetDefault<UDamageType>();
-	Killer = GetDamageInstigator(Killer, *DamageType);
-
-	// forcibly end any timers that may be in flight
-	GetWorldTimerManager().ClearAllTimersForObject(this);
-
-	// notify the game mode if an Enemy dies
-	/*if (GetTeamNum() == EStrategyTeam::Enemy)
-	{
-		AStrategyGameState* const GameState = GetWorld()->GetGameState<AStrategyGameState>();
-		if (GameState)
-		{
-			GameState->OnCharDied(this);
-		}
-	}*/
-
-	// disable any AI
-	/*AStrategyAIController* const AIController = Cast<AStrategyAIController>(Controller);
-	if (AIController)
-	{
-		AIController->EnableLogic(false);
-	}*/
-
-	// turn off collision
-	if (CapsuleComponent.IsValid())
-	{
-		CapsuleComponent->BodyInstance.SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		CapsuleComponent->BodyInstance.SetResponseToChannel(ECC_Pawn, ECR_Ignore);
-		CapsuleComponent->BodyInstance.SetResponseToChannel(ECC_PhysicsBody, ECR_Ignore);
-	}
-
-	// turn off movement
-	if (CharacterMovement)
-	{
-		CharacterMovement->StopMovementImmediately();
-		CharacterMovement->DisableMovement();
-	}
-
-	// detach the controller
-	if (Controller != NULL)
-	{
-		Controller->UnPossess();
-	}
-
-	// play death animation
-	float DeathAnimDuration = PlayAnimMontage(DeathAnim);
-	BroadcastDeathAnimMontage();
-	ULabBlueprintLibrary::printDebugInfo("Death Animation Duration=" + FString::SanitizeFloat(DeathAnimDuration));
-	GetWorldTimerManager().SetTimer(this, &ALabPawn::OnDieAnimationEnd, DeathAnimDuration - 0.7, false);
-}
-
-void ALabPawn::OnDieAnimationEnd()
-{
-	Mesh->bNoSkeletonUpdate = true;
-	//bPauseAnims = true;
-	
-	//bNoSkeletonUpdate = true;
-	//this->SetActorHiddenInGame(true);
-	// delete the pawn asap
-	SetLifeSpan(10.1f);
-}
-
-
-void ALabPawn::BroadcastDeathAnimMontage_Implementation()
-{
-	float DeathAnimDuration = PlayAnimMontage(DeathAnim);
-	GetWorldTimerManager().SetTimer(this, &ALabPawn::OnDieAnimationEnd, DeathAnimDuration + 0.01, false);
-}
 
 float ALabPawn::ServerPlayAttackMontage()
 {
@@ -283,4 +203,197 @@ float ALabPawn::ServerPlayAttackMontage()
 void ALabPawn::BroadcastPlayAttackMontage_Implementation()
 {
 	PlayAnimMontage(MeleeAnim);
+}
+
+
+bool ALabPawn::CanDie(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser) const
+{
+	if (bIsDying										// already dying
+		|| IsPendingKill()								// already destroyed
+		|| Role != ROLE_Authority						// not authority
+		|| GetWorld()->GetAuthGameMode() == NULL
+		|| GetWorld()->GetAuthGameMode()->GetMatchState() == MatchState::LeavingMap)	// level transition occurring
+	{
+		return false;
+	}
+
+	return true;
+}
+
+
+bool ALabPawn::Die(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser)
+{
+	if (!CanDie(KillingDamage, DamageEvent, Killer, DamageCauser))
+	{
+		return false;
+	}
+
+	Health = FMath::Min(0.0f, (float)Health);
+
+	// if this is an environmental death then refer to the previous killer so that they receive credit (knocked into lava pits, etc)
+	UDamageType const* const DamageType = DamageEvent.DamageTypeClass ? DamageEvent.DamageTypeClass->GetDefaultObject<UDamageType>() : GetDefault<UDamageType>();
+	Killer = GetDamageInstigator(Killer, *DamageType);
+
+	//AController* const KilledPlayer = (Controller != NULL) ? Controller : Cast<AController>(GetOwner());
+	//GetWorld()->GetAuthGameMode<AShooterGameMode>()->Killed(Killer, KilledPlayer, this, DamageType);
+
+	NetUpdateFrequency = GetDefault<ALabPawn>()->NetUpdateFrequency;
+	CharacterMovement->ForceReplicationUpdate();
+
+	OnDeath(KillingDamage, DamageEvent, Killer ? Killer->GetPawn() : NULL, DamageCauser);
+	return true;
+}
+
+void ALabPawn::OnDeath(float KillingDamage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser)
+{
+	if (bIsDying)
+	{
+		return;
+	}
+
+	bReplicateMovement = false;
+	bTearOff = true;
+	bIsDying = true;
+
+	if (Role == ROLE_Authority)
+	{
+		ReplicateHit(KillingDamage, DamageEvent, PawnInstigator, DamageCauser, true);
+	}
+
+	// cannot use IsLocallyControlled here, because even local client's controller may be NULL here
+	/*if (GetNetMode() != NM_DedicatedServer && DeathSound && Mesh1P && Mesh1P->IsVisible())
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+	}*/
+
+
+	DetachFromControllerPendingDestroy();
+	StopAllAnimMontages();
+
+	// disable collisions on capsule
+	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CapsuleComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	if (Mesh)
+	{
+		static FName CollisionProfileName(TEXT("Ragdoll"));
+		Mesh->SetCollisionProfileName(CollisionProfileName);
+	}
+	SetActorEnableCollision(true);
+
+	// Death anim
+	float DeathAnimDuration = PlayAnimMontage(DeathAnim);
+
+	// Ragdoll
+	if (DeathAnimDuration > 0.f)
+	{
+		GetWorldTimerManager().SetTimer(this, &ALabPawn::SetRagdollPhysics, FMath::Min(0.1f, DeathAnimDuration), false);
+	}
+	else
+	{
+		SetRagdollPhysics();
+	}
+}
+
+void ALabPawn::PlayHit(float DamageTaken, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser)
+{
+	if (Role == ROLE_Authority)
+	{
+		ReplicateHit(DamageTaken, DamageEvent, PawnInstigator, DamageCauser, false);
+	}
+}
+
+
+void ALabPawn::SetRagdollPhysics()
+{
+
+	bool bInRagdoll = false;
+
+	if (IsPendingKill())
+	{
+		bInRagdoll = false;
+	}
+	else if (!Mesh || !Mesh->GetPhysicsAsset())
+	{
+		bInRagdoll = false;
+	}
+	else
+	{
+		// initialize physics/etc
+		Mesh->SetAllBodiesSimulatePhysics(true);
+		Mesh->SetSimulatePhysics(true);
+		Mesh->WakeAllRigidBodies();
+		Mesh->bBlendPhysics = true;
+
+		bInRagdoll = true;
+	}
+
+	CharacterMovement->StopMovementImmediately();
+	CharacterMovement->DisableMovement();
+	CharacterMovement->SetComponentTickEnabled(false);
+
+	if (!bInRagdoll)
+	{
+		// hide and set short lifespan
+		TurnOff();
+		SetActorHiddenInGame(true);
+		SetLifeSpan(1.0f);
+	}
+	else
+	{
+		SetLifeSpan(5.0f);
+	}
+}
+
+
+
+void ALabPawn::ReplicateHit(float Damage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser, bool bKilled)
+{
+	const float TimeoutTime = GetWorld()->GetTimeSeconds() + 0.5f;
+
+	FDamageEvent const& LastDamageEvent = LastTakeHitInfo.GetDamageEvent();
+	if ((PawnInstigator == LastTakeHitInfo.PawnInstigator.Get()) && (LastDamageEvent.DamageTypeClass == LastTakeHitInfo.DamageTypeClass) && (LastTakeHitTimeTimeout == TimeoutTime))
+	{
+		// same frame damage
+		if (bKilled && LastTakeHitInfo.bKilled)
+		{
+			// Redundant death take hit, just ignore it
+			return;
+		}
+
+		// otherwise, accumulate damage done this frame
+		Damage += LastTakeHitInfo.ActualDamage;
+	}
+
+	LastTakeHitInfo.ActualDamage = Damage;
+	LastTakeHitInfo.PawnInstigator = Cast<ALabPawn>(PawnInstigator);
+	LastTakeHitInfo.DamageCauser = DamageCauser;
+	LastTakeHitInfo.SetDamageEvent(DamageEvent);
+	LastTakeHitInfo.bKilled = bKilled;
+	LastTakeHitInfo.EnsureReplication();
+
+	LastTakeHitTimeTimeout = TimeoutTime;
+}
+
+void ALabPawn::OnRep_LastTakeHitInfo()
+{
+	if (LastTakeHitInfo.bKilled)
+	{
+		ULabBlueprintLibrary::printDebugInfo("ALabPawn::OnRep_LastTakeHitInfo: killed");
+		OnDeath(LastTakeHitInfo.ActualDamage, LastTakeHitInfo.GetDamageEvent(), LastTakeHitInfo.PawnInstigator.Get(), LastTakeHitInfo.DamageCauser.Get());
+	}
+	else
+	{
+		ULabBlueprintLibrary::printDebugInfo("ALabPawn::OnRep_LastTakeHitInfo: been hit");
+		PlayHit(LastTakeHitInfo.ActualDamage, LastTakeHitInfo.GetDamageEvent(), LastTakeHitInfo.PawnInstigator.Get(), LastTakeHitInfo.DamageCauser.Get());
+	}
+}
+
+void ALabPawn::StopAllAnimMontages()
+{
+	
+	if (Mesh && Mesh->AnimScriptInstance)
+	{
+		Mesh->AnimScriptInstance->Montage_Stop(0.0f);
+	}
 }
