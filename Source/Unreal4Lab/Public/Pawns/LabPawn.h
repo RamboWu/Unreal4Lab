@@ -25,16 +25,16 @@ class UNREAL4LAB_API ALabPawn : public ACharacter,
 	/*ILabStateInterface begin*/
 	virtual uint8 GetTeamNum() const override;
 
-	virtual uint32 GetHealth() override;
+	virtual int32 GetHealth() const override;
 
-	virtual float GetHealthPercentage() override;
+	virtual float GetHealthPercentage() const override;
 
-	virtual uint32 GetMaxHealth() override;
+	virtual int32 GetMaxHealth() const override;
 
 	UFUNCTION(BlueprintCallable, Category = State)
-	virtual uint32 GetAttackRange() const override;
+	virtual int32 GetAttackRange() const override;
 
-	virtual uint32 GetSightDistance() override;
+	virtual int32 GetSightDistance() const override;
 
 	virtual float GetDamage() const override;
 	/*ILabStateInterface end*/
@@ -42,11 +42,8 @@ class UNREAL4LAB_API ALabPawn : public ACharacter,
 	/** set team number */
 	void SetTeamNum(uint8 NewTeamNum);
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void Client_PlayMeleeAnim();
-
-	UFUNCTION(NetMulticast, Unreliable)
-	void Client_PlayDeathAnim();
+	//UFUNCTION(NetMulticast, Unreliable)
+	//void Client_PlayMeleeAnim();
 
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = State)
 	class ULabPawnReplicationInfo* PawnReplicationInfo;
@@ -65,7 +62,14 @@ class UNREAL4LAB_API ALabPawn : public ACharacter,
 	*/
 	virtual void Die(float KillingDamage, struct FDamageEvent const& DamageEvent, class AController* Killer, class AActor* DamageCauser);
 
-protected:
+	UFUNCTION(NetMulticast, Unreliable)
+	virtual void BroadcastDeathAnimMontage();
+
+	virtual float ServerPlayAttackMontage();
+	
+	UFUNCTION(NetMulticast, Unreliable)
+	virtual void BroadcastPlayAttackMontage();
+
 	/** melee anim */
 	UPROPERTY(EditDefaultsOnly, Category = View)
 	class UAnimMontage* MeleeAnim;
@@ -74,6 +78,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = View)
 	class UAnimMontage* DeathAnim;
 
+protected:
 	/*team num*/
 	UPROPERTY(EditAnywhere, Replicated,  Category = State)
 	TEnumAsByte<ELabTeam::Type> m_team_num;

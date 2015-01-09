@@ -40,44 +40,27 @@ void ALabPawn::SetTeamNum(uint8 NewTeamNum)
 	m_team_num = (TEnumAsByte<ELabTeam::Type>)NewTeamNum;
 }
 
-uint32 ALabPawn::GetHealth()
+int32 ALabPawn::GetHealth() const
 {
 	return Health;
 }
 
-float ALabPawn::GetHealthPercentage()
+float ALabPawn::GetHealthPercentage() const
 {
 	return ((float)Health / GetMaxHealth());
 }
 
-uint32 ALabPawn::GetMaxHealth()
+int32 ALabPawn::GetMaxHealth() const
 {
 	return BaseHealth;
 }
 
-uint32 ALabPawn::GetAttackRange() const
+int32 ALabPawn::GetAttackRange() const
 {
 	return BaseAttackDistance;
 }
 
-void ALabPawn::Client_PlayMeleeAnim_Implementation()
-{
-
-	if ((Health > 0.f) && MeleeAnim)
-	{
-		float duration = PlayAnimMontage(MeleeAnim);
-	}
-}
-
-void ALabPawn::Client_PlayDeathAnim_Implementation()
-{
-	if (DeathAnim)
-	{
-		float duration = PlayAnimMontage(DeathAnim);
-	}
-}
-
-uint32 ALabPawn::GetSightDistance()
+int32 ALabPawn::GetSightDistance() const
 {
 	return BaseSightDistance;
 }
@@ -257,20 +240,47 @@ void ALabPawn::Die(float KillingDamage, FDamageEvent const& DamageEvent, AContro
 	}
 
 	// play death animation
-	float DeathAnimDuration = 2.f;
-	if (DeathAnim)
-	{
-		Client_PlayDeathAnim();
-		//DeathAnimDuration = PlayAnimMontage(DeathAnim) / (Mesh.IsValid() && Mesh->GlobalAnimRateScale > 0 ? Mesh->GlobalAnimRateScale : 1);
-		//UAnimInstance * AnimInstance = (Mesh) ? Mesh->GetAnimInstance() : NULL;
-	}
+	float DeathAnimDuration = PlayAnimMontage(DeathAnim);
+	BroadcastDeathAnimMontage();
 	ULabBlueprintLibrary::printDebugInfo("Death Animation Duration=" + FString::SanitizeFloat(DeathAnimDuration));
-	GetWorldTimerManager().SetTimer(this, &ALabPawn::OnDieAnimationEnd, DeathAnimDuration + 0.01, false);
+	GetWorldTimerManager().SetTimer(this, &ALabPawn::OnDieAnimationEnd, DeathAnimDuration - 0.7, false);
 }
 
 void ALabPawn::OnDieAnimationEnd()
 {
-	this->SetActorHiddenInGame(true);
+	Mesh->bNoSkeletonUpdate = true;
+	//bPauseAnims = true;
+	
+	//bNoSkeletonUpdate = true;
+	//this->SetActorHiddenInGame(true);
 	// delete the pawn asap
-	SetLifeSpan(0.01f);
+	SetLifeSpan(10.1f);
+}
+
+
+void ALabPawn::BroadcastDeathAnimMontage_Implementation()
+{
+	float DeathAnimDuration = PlayAnimMontage(DeathAnim);
+	GetWorldTimerManager().SetTimer(this, &ALabPawn::OnDieAnimationEnd, DeathAnimDuration + 0.01, false);
+}
+
+float ALabPawn::ServerPlayAttackMontage()
+{
+	float duration = 0.f;
+	if (HasAuthority())
+	{
+		if (MeleeAnim)
+		{
+			duration = PlayAnimMontage(MeleeAnim);
+			BroadcastPlayAttackMontage();
+		}
+
+	}
+
+	return duration;
+}
+
+void ALabPawn::BroadcastPlayAttackMontage_Implementation()
+{
+	PlayAnimMontage(MeleeAnim);
 }

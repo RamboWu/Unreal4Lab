@@ -15,19 +15,19 @@ class ILabStateInterface
 {
 	GENERATED_IINTERFACE_BODY()
 
-	virtual uint32 GetHealth();
+	virtual int32 GetHealth() const;
 
-	virtual float GetHealthPercentage();
+	virtual float GetHealthPercentage() const;
 
-	virtual uint32 GetMaxHealth();
+	virtual int32 GetMaxHealth() const;
 
-	virtual bool HasMana();
+	virtual bool HasMana() const;
 
-	virtual uint32 getMana();
+	virtual int32 getMana() const;
 
-	virtual float GetManaPercentage();
+	virtual float GetManaPercentage() const;
 
-	virtual uint32 GetAttackRange() const;
+	virtual int32 GetAttackRange() const;
 
-	virtual uint32 GetSightDistance();
+	virtual int32 GetSightDistance() const;
 };

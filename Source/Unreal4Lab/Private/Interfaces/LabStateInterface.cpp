@@ -7,42 +7,42 @@ ULabStateInterface::ULabStateInterface(const class FPostConstructInitializePrope
 
 }
 
-uint32 ILabStateInterface::GetHealth()
+int32 ILabStateInterface::GetHealth() const
 {
 	return 0;
 }
 
-float ILabStateInterface::GetHealthPercentage()
+float ILabStateInterface::GetHealthPercentage() const
 {
 	return 0.f;
 }
 
-bool ILabStateInterface::HasMana()
+bool ILabStateInterface::HasMana() const
 {
 	return false;
 }
 
-uint32 ILabStateInterface::getMana()
+int32 ILabStateInterface::getMana() const
 {
 	return 0;
 }
 
-float ILabStateInterface::GetManaPercentage()
+float ILabStateInterface::GetManaPercentage() const
 {
 	return 0.f;
 }
 
-uint32 ILabStateInterface::GetMaxHealth()
+int32 ILabStateInterface::GetMaxHealth() const
 {
 	return 0;
 }
 
-uint32 ILabStateInterface::GetAttackRange() const
+int32 ILabStateInterface::GetAttackRange() const
 {
 	return 0;
 }
 
-uint32 ILabStateInterface::GetSightDistance()
+int32 ILabStateInterface::GetSightDistance() const
 {
 	return 0;
 }

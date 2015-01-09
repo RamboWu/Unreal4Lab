@@ -58,6 +58,9 @@ protected:
 	/** move closer to target */
 	void MoveCloser();
 
+	/** Checks actor and returns true if valid */
+	bool IsTargetValid(AActor* InActor) const;
+
 	uint8 EnemyKeyID;
 	uint8 EnemyLocationID;
 

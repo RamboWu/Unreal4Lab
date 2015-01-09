@@ -101,10 +101,11 @@ void ALabAIController::SearchForEnemy()
 
 	//check if the current enemy is still alive and in the sight distance
 	//TODO IsValid 判断是否死亡还不是很准确
-	if (enemey)
+	if (enemey && IsTargetValid(enemey))
 	{
 		if (AllTargets.Contains(Cast<AActor>(enemey)))
 		{
+			//ULabBlueprintLibrary::printDebugInfo("Current enemy" + enemey->GetName() + "Is still valid!");
 			return;
 		}
 	}
@@ -114,25 +115,37 @@ void ALabAIController::SearchForEnemy()
 	float best_dist = MAX_FLT;
 	ALabPawn* best_target = NULL;
 
-	for (int32 i = 0; i < AllTargets.Num(); i++)
+
+	int32 i = 0;
+	while (i < AllTargets.Num())
 	{
+		//check if it is self
 		APawn* tmp_target1 = Cast<APawn>(AllTargets[i]);
 		if (tmp_target1 && my_bot == tmp_target1)
 		{
+			i++;
 			continue;
 		}
-
 		ALabPawn* tmp_target = Cast<ALabPawn>(AllTargets[i]);
 		if (tmp_target)
 		{
+			if (!IsTargetValid(tmp_target))
+			{
+				//ULabBlueprintLibrary::printDebugInfo(tmp_target->GetName() + "Is not valid target any more!");
+				AllTargets.RemoveAt(i);
+				continue;
+			}
+			//ULabBlueprintLibrary::printDebugInfo(tmp_target->GetName() + "Is still valid!");
 			const float dist = FVector::Dist(tmp_target->GetActorLocation(), my_location);
 			if (dist < best_dist)
 			{
 				best_dist = dist;
 				best_target = tmp_target;
 			}
+			i++;
 		}
 	}
+
 	if (best_target)
 	{
 		SetEnemy(best_target);
@@ -178,12 +191,11 @@ void ALabAIController::Attack()
 
 			if (!bMovingToTarget)
 			{
-				self_pawn->Client_PlayMeleeAnim();
+				float duration = self_pawn->ServerPlayAttackMontage();
 
 				FDamageEvent damage_event;
 				enemey->TakeDamage(self_pawn->PawnReplicationInfo->Damage, damage_event, this, self_pawn);
-				//UGameplayStatics::ApplyDamage(enemey, self_pawn->GetDamage(), Instigator, self_pawn);
-				MeleeAttackAnimationEndTime = GetWorld()->GetTimeSeconds() + 1.f;
+				MeleeAttackAnimationEndTime = GetWorld()->GetTimeSeconds() + duration;
 				bIsPlayingAnimation = true;
 			}
 
@@ -277,3 +289,26 @@ void ALabAIController::OnEndOverlap(class AActor* OtherActor, class UPrimitiveCo
 	}
 }
 
+bool ALabAIController::IsTargetValid(AActor* InActor) const
+{
+	// try to find a character
+	const ALabPawn* TestChar = Cast<ALabPawn>(InActor);
+	if (TestChar == NULL)
+	{
+		// if Actor is a Controller, try to use its pawn
+		const ALabAIController* const Controller = Cast<ALabAIController>(InActor);
+		if (Controller != NULL)
+		{
+			TestChar = Cast<ALabPawn>(Controller->GetPawn());
+		}
+	}
+
+	
+	if (TestChar && ((float)TestChar->GetHealth() > 0.01f) && ALabGameMode::OnEnemyTeam(TestChar, this))
+	{
+		//ULabBlueprintLibrary::printDebugInfo("TestChar = " + TestChar->GetName() + "health=" + FString::FromInt(TestChar->GetHealth()));
+		return true;
+	}
+
+	return false;
+}

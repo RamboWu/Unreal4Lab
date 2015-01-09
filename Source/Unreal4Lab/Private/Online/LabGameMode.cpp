@@ -2,6 +2,7 @@
 
 #include "Unreal4Lab.h"
 #include "LabGameMode.h"
+#include "AIController.h"
 #include "LabPlayerController.h"
 #include "LabPlayerProxy.h"
 #include "LabHero.h"
@@ -117,6 +118,18 @@ bool ALabGameMode::OnFriendlyTeam(const AActor* ActorA, const AActor* ActorB)
 {
 	const ILabTeamInterface* TeamA = InterfaceCast<const ILabTeamInterface>(ActorA);
 	const ILabTeamInterface* TeamB = InterfaceCast<const ILabTeamInterface>(ActorB);
+	//probably ActorA is a controller,and we will get it's pawn
+	if (TeamA == NULL)
+	{
+		const AAIController* controller = Cast<AAIController>(ActorA);
+		TeamA = InterfaceCast<const ILabTeamInterface>(controller->GetPawn());
+	}
+	//probably ActorA is a controller,and we will get it's pawn
+	if (TeamB == NULL)
+	{
+		const AAIController* controller = Cast<AAIController>(ActorB);
+		TeamB = InterfaceCast<const ILabTeamInterface>(controller->GetPawn());
+	}
 
 	if ((TeamA != NULL && TeamA->GetTeamNum() == ELabTeam::Unknown) || (TeamB != NULL && TeamB->GetTeamNum() == ELabTeam::Unknown))
 		return true;
@@ -128,6 +141,19 @@ bool ALabGameMode::OnEnemyTeam(const AActor* ActorA, const AActor* ActorB)
 {
 	const ILabTeamInterface* TeamA = InterfaceCast<const ILabTeamInterface>(ActorA);
 	const ILabTeamInterface* TeamB = InterfaceCast<const ILabTeamInterface>(ActorB);
+	//probably ActorA is a controller,and we will get it's pawn
+	if (TeamA == NULL)
+	{
+		const AAIController* controller = Cast<AAIController>(ActorA);
+		TeamA = InterfaceCast<const ILabTeamInterface>(controller->GetPawn());
+	}
+
+	//probably ActorA is a controller,and we will get it's pawn
+	if (TeamB == NULL)
+	{
+		const AAIController* controller = Cast<AAIController>(ActorB);
+		TeamB = InterfaceCast<const ILabTeamInterface>(controller->GetPawn());
+	}
 
 	if ((TeamA != NULL && TeamA->GetTeamNum() == ELabTeam::Unknown) || (TeamB != NULL && TeamB->GetTeamNum() == ELabTeam::Unknown))
 		return false;
