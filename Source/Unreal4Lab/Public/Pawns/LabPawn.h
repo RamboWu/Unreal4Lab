@@ -3,6 +3,7 @@
 #pragma once
 
 #include "LabTypes.h"
+#include "LabPawnReplicationInfo.h"
 #include "LabTeamInterface.h"
 #include "LabStateInterface.h"
 #include "LabAttackInterface.h"
@@ -32,9 +33,6 @@ class UNREAL4LAB_API ALabPawn : public ACharacter,
 	virtual float GetHealthPercentage() const override;
 
 	UFUNCTION(BlueprintCallable, Category = State)
-	float GetHealthPer() const;
-
-	UFUNCTION(BlueprintCallable, Category = State)
 	virtual int32 GetMaxHealth() const override;
 
 	UFUNCTION(BlueprintCallable, Category = State)
@@ -52,8 +50,8 @@ class UNREAL4LAB_API ALabPawn : public ACharacter,
 	//UFUNCTION(NetMulticast, Unreliable)
 	//void Client_PlayMeleeAnim();
 
-	UPROPERTY(BlueprintReadOnly, Replicated, Category = State)
-	class ULabPawnReplicationInfo* PawnReplicationInfo;
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Test, Category = State)
+	struct FLabPawnReplicationInfo  PawnReplicationInfo;
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -98,6 +96,10 @@ protected:
 	/** play hit or death on client */
 	UFUNCTION()
 	void OnRep_LastTakeHitInfo();
+
+	/** play hit or death on client */
+	UFUNCTION()
+	void OnRep_Test();
 
 	/** Replicate where this pawn was last hit and damaged */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_LastTakeHitInfo)

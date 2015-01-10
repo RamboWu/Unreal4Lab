@@ -77,11 +77,11 @@ void ALabPawn::Tick(float DeltaTime)
 		RecalculateStats();
 
 		// Update the health and mana
-		if (PawnReplicationInfo != NULL)
-		{
-			Health = FMath::Min(float(PawnReplicationInfo->HealthMax), Health + (PawnReplicationInfo->HealthRegenerationAmount * DeltaTime));
+// 		if (PawnReplicationInfo != NULL)
+// 		{
+			Health = FMath::Min(float(PawnReplicationInfo.HealthMax), Health + (PawnReplicationInfo.HealthRegenerationAmount * DeltaTime));
 			//Mana = FMin(UDKMOBAPawnReplicationInfo.ManaMax, Mana + (UDKMOBAPawnReplicationInfo.ManaRegenerationAmount * DeltaTime));
-		}
+/*		}*/
 	}
 
 }
@@ -91,11 +91,12 @@ void ALabPawn::BeginPlay()
 	Super::BeginPlay();
 
 	//UE_LOG(LogLab, Log, TEXT("ALabPawn::BeginPlay()"));
-	PawnReplicationInfo = ConstructObject<ULabPawnReplicationInfo>(ULabPawnReplicationInfo::StaticClass(), this);
-	StatsModifier = ConstructObject<ULabStatsModifier>(ULabStatsModifier::StaticClass(), this);
+	//PawnReplicationInfo = ConstructObject<ULabPawnReplicationInfo>(ULabPawnReplicationInfo::StaticClass(), this);
+	
 		
 	if (HasAuthority())
 	{
+		StatsModifier = ConstructObject<ULabStatsModifier>(ULabStatsModifier::StaticClass(), this);
 		if (StatsModifier)
 		{
 			//StatsModifier->AddStatChange(STATNAME_HPMax, 10, MODTYPE_Growth, 0.f, true);
@@ -117,8 +118,8 @@ void ALabPawn::RecalculateStats()
 		return;
 	}
 
-	if (PawnReplicationInfo != NULL)
-	{
+// 	if (PawnReplicationInfo != NULL)
+// 	{
 		// MUST calc attributes first
 		//UDKMOBAPawnReplicationInfo.Strength = StatsModifier.CalculateStat(STATNAME_Strength);
 		//UDKMOBAPawnReplicationInfo.Agility = StatsModifier.CalculateStat(STATNAME_Agility);
@@ -127,21 +128,22 @@ void ALabPawn::RecalculateStats()
 		// Now can go through the rest
 		//UDKMOBAPawnReplicationInfo.ManaMax = StatsModifier.CalculateStat(STATNAME_ManaMax, BaseMana);
 
-		PawnReplicationInfo->HealthMax = StatsModifier->CalculateStat(STATNAME_HPMax, BaseHealth);
-		PawnReplicationInfo->Damage = StatsModifier->CalculateStat(STATNAME_Damage, BaseDamage);
+		//PawnReplicationInfo->HealthMax++;
+		PawnReplicationInfo.HealthMax = StatsModifier->CalculateStat(STATNAME_HPMax, BaseHealth);
+		PawnReplicationInfo.Damage = StatsModifier->CalculateStat(STATNAME_Damage, BaseDamage);
 		// If just spawned, then set Mana  and Health to Max
 
 		if (JustSpawned)
 		{
 			JustSpawned = false;
-			Health = PawnReplicationInfo->HealthMax;
+			Health = PawnReplicationInfo.HealthMax;
 		}
-	}
+/*	}*/
 }
 
 float ALabPawn::GetDamage() const
 {
-	return PawnReplicationInfo->Damage;
+	return PawnReplicationInfo.Damage;
 }
 
 float ALabPawn::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
@@ -391,6 +393,14 @@ void ALabPawn::OnRep_LastTakeHitInfo()
 	}
 }
 
+void ALabPawn::OnRep_Test()
+{
+	if (HasAuthority())
+		ULabBlueprintLibrary::printDebugInfo("Server" + GetName() + "OnRep_Test");
+	else
+		ULabBlueprintLibrary::printDebugInfo("Client" + GetName() + "OnRep_Test");
+}
+
 void ALabPawn::StopAllAnimMontages()
 {
 	
@@ -398,9 +408,4 @@ void ALabPawn::StopAllAnimMontages()
 	{
 		Mesh->AnimScriptInstance->Montage_Stop(0.0f);
 	}
-}
-
-float ALabPawn::GetHealthPer() const
-{
-	return (float)GetHealth() / GetMaxHealth();
 }

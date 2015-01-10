@@ -8,10 +8,10 @@
 /**
  * 
  */
-UCLASS()
-class UNREAL4LAB_API ULabHeroPawnReplicationInfo : public ULabPawnReplicationInfo
+USTRUCT()
+struct FLabHeroPawnReplicationInfo : public FLabPawnReplicationInfo
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_USTRUCT_BODY()
 
 	
 	

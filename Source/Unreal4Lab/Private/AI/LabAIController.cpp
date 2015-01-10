@@ -194,7 +194,7 @@ void ALabAIController::Attack()
 				float duration = self_pawn->ServerPlayAttackMontage();
 
 				FDamageEvent damage_event;
-				enemey->TakeDamage(self_pawn->PawnReplicationInfo->Damage, damage_event, this, self_pawn);
+				enemey->TakeDamage(self_pawn->PawnReplicationInfo.Damage, damage_event, this, self_pawn);
 				MeleeAttackAnimationEndTime = GetWorld()->GetTimeSeconds() + duration;
 				bIsPlayingAnimation = true;
 			}

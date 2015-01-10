@@ -5,25 +5,27 @@
 #include "Object.h"
 #include "LabPawnReplicationInfo.generated.h"
 
-/**
- * 
- */
-UCLASS()
-class UNREAL4LAB_API ULabPawnReplicationInfo : public UObject
+/** replicated information on a hit we've taken */
+USTRUCT()
+struct FLabPawnReplicationInfo
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY(BlueprintReadOnly, Replicated, Category = State)
+
+	UPROPERTY(BlueprintReadOnly, Category = State)
 	int32 HealthMax;
 
 	// How much health the pawn should regenerate per second
-	UPROPERTY(BlueprintReadOnly, Replicated, Category = State)
+	UPROPERTY(BlueprintReadOnly, Category = State)
 	float HealthRegenerationAmount;
 
-	UPROPERTY(BlueprintReadOnly, Replicated, Category = State)
+	UPROPERTY(BlueprintReadOnly, Category = State)
 	int32 Level;
 
-	UPROPERTY(BlueprintReadOnly, Replicated, Category = State)
+	UPROPERTY(BlueprintReadOnly, Category = State)
 	int32 Damage;
 
+public:
+	FLabPawnReplicationInfo()
+	{}
 };

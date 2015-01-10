@@ -4,10 +4,10 @@
 #include "LabUnitPawnReplicationInfo.h"
 
 
-ULabUnitPawnReplicationInfo::ULabUnitPawnReplicationInfo(const class FPostConstructInitializeProperties& PCIP)
-	: Super(PCIP)
-{
-
-}
+// FLabUnitPawnReplicationInfo::FLabUnitPawnReplicationInfo(/*const class FPostConstructInitializeProperties& PCIP*/)
+// 	: Super(/*PCIP*/)
+// {
+// 
+// }
 
 

@@ -2,12 +2,12 @@
 
 #include "Unreal4Lab.h"
 #include "LabHeroPawnReplicationInfo.h"
-
-
-ULabHeroPawnReplicationInfo::ULabHeroPawnReplicationInfo(const class FPostConstructInitializeProperties& PCIP)
-	: Super(PCIP)
-{
-
-}
-
+// 
+// 
+// FLabHeroPawnReplicationInfo::FLabHeroPawnReplicationInfo(/*const class FPostConstructInitializeProperties& PCIP*/)
+// 	: Super(/*PCIP*/)
+// {
+// 
+// }
+// 
 
