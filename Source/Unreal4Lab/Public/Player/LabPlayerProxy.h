@@ -25,7 +25,7 @@ class UNREAL4LAB_API ALabPlayerProxy : public APawn
 	TSubclassOf<AActor> CharacterClass;
 
 	// Pointer to the actual character. We replicate it so we know its location for the camera on the client 
-	UPROPERTY(Replicated)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category=Proxy)
 	class ALabPawn* Character;
 
 	// The AI Controller we will use to auto-navigate the player 

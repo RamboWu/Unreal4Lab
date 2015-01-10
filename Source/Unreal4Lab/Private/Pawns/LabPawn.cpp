@@ -90,11 +90,12 @@ void ALabPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//UE_LOG(LogLab, Log, TEXT("ALabPawn::BeginPlay()"));
+	PawnReplicationInfo = ConstructObject<ULabPawnReplicationInfo>(ULabPawnReplicationInfo::StaticClass(), this);
+	StatsModifier = ConstructObject<ULabStatsModifier>(ULabStatsModifier::StaticClass(), this);
+		
 	if (HasAuthority())
 	{
-		UE_LOG(LogLab, Log, TEXT("ALabPawn::BeginPlay()"));
-		PawnReplicationInfo = ConstructObject<ULabPawnReplicationInfo>(ULabPawnReplicationInfo::StaticClass(), this);
-		StatsModifier = ConstructObject<ULabStatsModifier>(ULabStatsModifier::StaticClass(), this);
 		if (StatsModifier)
 		{
 			//StatsModifier->AddStatChange(STATNAME_HPMax, 10, MODTYPE_Growth, 0.f, true);
@@ -102,6 +103,7 @@ void ALabPawn::BeginPlay()
 			//StatsModifier.AddStatChange(STATNAME_Intelligence, BaseIntelligence, MODTYPE_Addition, 0.f, true);
 		}
 	}
+		
 }
 
 
@@ -396,4 +398,9 @@ void ALabPawn::StopAllAnimMontages()
 	{
 		Mesh->AnimScriptInstance->Montage_Stop(0.0f);
 	}
+}
+
+float ALabPawn::GetHealthPer() const
+{
+	return (float)GetHealth() / GetMaxHealth();
 }

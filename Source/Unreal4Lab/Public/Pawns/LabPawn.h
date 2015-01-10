@@ -25,10 +25,16 @@ class UNREAL4LAB_API ALabPawn : public ACharacter,
 	/*ILabStateInterface begin*/
 	virtual uint8 GetTeamNum() const override;
 
+	UFUNCTION(BlueprintCallable, Category = State)
 	virtual int32 GetHealth() const override;
 
+	UFUNCTION(BlueprintCallable, Category = State)
 	virtual float GetHealthPercentage() const override;
 
+	UFUNCTION(BlueprintCallable, Category = State)
+	float GetHealthPer() const;
+
+	UFUNCTION(BlueprintCallable, Category = State)
 	virtual int32 GetMaxHealth() const override;
 
 	UFUNCTION(BlueprintCallable, Category = State)
@@ -36,6 +42,7 @@ class UNREAL4LAB_API ALabPawn : public ACharacter,
 
 	virtual int32 GetSightDistance() const override;
 
+	UFUNCTION(BlueprintCallable, Category = State)
 	virtual float GetDamage() const override;
 	/*ILabStateInterface end*/
 
