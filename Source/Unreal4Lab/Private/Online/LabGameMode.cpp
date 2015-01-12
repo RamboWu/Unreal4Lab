@@ -6,6 +6,7 @@
 #include "LabPlayerController.h"
 #include "LabPlayerProxy.h"
 #include "LabHero.h"
+#include "LabHUD.h"
 #include "LabPlayerState.h"
 
 ALabGameMode::ALabGameMode(const class FPostConstructInitializeProperties& PCIP) 
@@ -16,6 +17,7 @@ ALabGameMode::ALabGameMode(const class FPostConstructInitializeProperties& PCIP)
 
 	DefaultPawnClass = ALabPlayerProxy::StaticClass();
 	PlayerStateClass = ALabPlayerState::StaticClass();
+	HUDClass = ALabHUD::StaticClass();
 
 }
 
