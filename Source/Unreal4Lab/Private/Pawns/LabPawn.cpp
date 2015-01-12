@@ -79,8 +79,11 @@ void ALabPawn::Tick(float DeltaTime)
 		// Update the health and mana
 // 		if (PawnReplicationInfo != NULL)
 // 		{
+		if (Health > 0){
 			Health = FMath::Min(float(PawnReplicationInfo.HealthMax), Health + (PawnReplicationInfo.HealthRegenerationAmount * DeltaTime));
 			//Mana = FMin(UDKMOBAPawnReplicationInfo.ManaMax, Mana + (UDKMOBAPawnReplicationInfo.ManaRegenerationAmount * DeltaTime));
+		}
+			
 /*		}*/
 	}
 
@@ -232,7 +235,7 @@ bool ALabPawn::Die(float KillingDamage, FDamageEvent const& DamageEvent, AContro
 		return false;
 	}
 
-	Health = FMath::Min(0.0f, (float)Health);
+	Health = FMath::Max(0.0f, (float)Health);
 
 	// if this is an environmental death then refer to the previous killer so that they receive credit (knocked into lava pits, etc)
 	UDamageType const* const DamageType = DamageEvent.DamageTypeClass ? DamageEvent.DamageTypeClass->GetDefaultObject<UDamageType>() : GetDefault<UDamageType>();
