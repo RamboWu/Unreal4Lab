@@ -11,7 +11,9 @@
 ALabPawn::ALabPawn(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP), 
 	BaseHealth(100),
+	BaseMana(100),
 	Health(0),
+	Mana(0),
 	BaseAttackDistance(100),
 	BaseSightDistance(300),
 	BaseDamage(30),
@@ -27,6 +29,7 @@ void ALabPawn::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ALabPawn, m_team_num);
 	DOREPLIFETIME(ALabPawn, Health);
+	DOREPLIFETIME(ALabPawn, Mana);
 	DOREPLIFETIME(ALabPawn, PawnReplicationInfo);
 	DOREPLIFETIME(ALabPawn, LastTakeHitInfo);
 }
@@ -81,7 +84,7 @@ void ALabPawn::Tick(float DeltaTime)
 // 		{
 		if (Health > 0){
 			Health = FMath::Min(float(PawnReplicationInfo.HealthMax), Health + (PawnReplicationInfo.HealthRegenerationAmount * DeltaTime));
-			//Mana = FMin(UDKMOBAPawnReplicationInfo.ManaMax, Mana + (UDKMOBAPawnReplicationInfo.ManaRegenerationAmount * DeltaTime));
+			Mana = FMath::Min(float(PawnReplicationInfo.ManaMax), Mana + (PawnReplicationInfo.ManaRegenerationAmount * DeltaTime));
 		}
 			
 /*		}*/
@@ -129,11 +132,9 @@ void ALabPawn::RecalculateStats()
 		//UDKMOBAPawnReplicationInfo.Intelligence = StatsModifier.CalculateStat(STATNAME_Intelligence);
 
 		// Now can go through the rest
-		//UDKMOBAPawnReplicationInfo.ManaMax = StatsModifier.CalculateStat(STATNAME_ManaMax, BaseMana);
-
-		//PawnReplicationInfo->HealthMax++;
-		PawnReplicationInfo.HealthMax = StatsModifier->CalculateStat(STATNAME_HPMax, BaseHealth);
-		PawnReplicationInfo.Damage = StatsModifier->CalculateStat(STATNAME_Damage, BaseDamage);
+	PawnReplicationInfo.ManaMax = StatsModifier->CalculateStat(STATNAME_ManaMax, BaseMana);
+	PawnReplicationInfo.HealthMax = StatsModifier->CalculateStat(STATNAME_HPMax, BaseHealth);
+	PawnReplicationInfo.Damage = StatsModifier->CalculateStat(STATNAME_Damage, BaseDamage);
 		// If just spawned, then set Mana  and Health to Max
 
 		if (JustSpawned)
@@ -163,7 +164,7 @@ float ALabPawn::TakeDamage(float DamageAmount, struct FDamageEvent const& Damage
 	// Modify based on game rules.
 	ALabGameMode* const Game = GetWorld()->GetAuthGameMode<ALabGameMode>();
 	DamageAmount = Game ? Game->ModifyDamage(DamageAmount, this, DamageEvent, EventInstigator, DamageCauser) : 0.f;
-
+	DamageAmount = AdjustDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	const float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (ActualDamage > 0.f)
 	{
@@ -411,4 +412,73 @@ void ALabPawn::StopAllAnimMontages()
 	{
 		Mesh->AnimScriptInstance->Montage_Stop(0.0f);
 	}
+}
+
+float ALabPawn::AdjustDamage(float DamageAmout, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
+{
+	/*
+	local float OutDamage;
+	local int i;
+	local UDKMOBAPawnReplicationInfo UDKMOBAPawnReplicationInfo;
+
+	OutDamage = InDamage;
+	UDKMOBAPawnReplicationInfo = UDKMOBAPawnReplicationInfo(PlayerReplicationInfo);
+	if (UDKMOBAPawnReplicationInfo != None)
+	{
+		// First, check for evasion
+		if (DamageType == class'UDKMOBADamageTypePhysical')
+		{
+			if (FRand() < UDKMOBAPawnReplicationInfo.Evasion)
+			{
+				// missed!
+				InDamage = 0;
+				return;
+			}
+		}
+		// And magic evasion...
+		else if (DamageType == class'UDKMOBADamageTypeMagical')
+		{
+			if (UDKMOBAPawnReplicationInfo.MagicImmunity || FRand() < UDKMOBAPawnReplicationInfo.MagicEvasion)
+			{
+				// immune/missed!
+				InDamage = 0;
+				return;
+			}
+			else
+			{
+				OutDamage *= UDKMOBAPawnReplicationInfo.MagicResistance;
+			}
+		}
+
+		// Iterate through spells, and allow them to adjust damage
+		for (i = 0; i < UDKMOBAPawnReplicationInfo.Spells.Length; ++i)
+		{
+			if (UDKMOBAPawnReplicationInfo.Spells[i] != None)
+			{
+				UDKMOBAPawnReplicationInfo.Spells[i].AdjustDamage(OutDamage, Momentum, InstigatedBy, HitLocation, DamageType, HitInfo, DamageCauser);
+			}
+		}
+
+		// Iterate through items, and allow them to adjust damage
+		for (i = 0; i < UDKMOBAPawnReplicationInfo.Items.Length; ++i)
+		{
+			if (UDKMOBAPawnReplicationInfo.Items[i] != None)
+			{
+				UDKMOBAPawnReplicationInfo.Items[i].AdjustDamage(OutDamage, Momentum, InstigatedBy, HitLocation, DamageType, HitInfo, DamageCauser);
+			}
+		}
+
+		// Now handle armor - these formulas taken from DotA
+		if (UDKMOBAPawnReplicationInfo.Armor > 0.f)
+		{
+			OutDamage *= 1.f - ((0.06f * UDKMOBAPawnReplicationInfo.Armor) / (1.06f * UDKMOBAPawnReplicationInfo.Armor));
+		}
+		else if (UDKMOBAPawnReplicationInfo.Armor < 0.f)
+		{
+			OutDamage *= 2.f - (0.94f ** Abs(UDKMOBAPawnReplicationInfo.Armor));
+		}
+	}
+
+	InDamage = Int(OutDamage);*/
+	return DamageAmout;
 }

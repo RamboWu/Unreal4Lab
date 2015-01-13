@@ -15,9 +15,15 @@ struct FLabPawnReplicationInfo
 	UPROPERTY(BlueprintReadOnly, Category = State)
 	int32 HealthMax;
 
+	UPROPERTY(BlueprintReadOnly, Category = State)
+	int32 ManaMax;
+	
 	// How much health the pawn should regenerate per second
 	UPROPERTY(BlueprintReadOnly, Category = State)
 	float HealthRegenerationAmount;
+
+	UPROPERTY(BlueprintReadOnly, Category = State)
+	float ManaRegenerationAmount;
 
 	UPROPERTY(BlueprintReadOnly, Category = State)
 	int32 Level;

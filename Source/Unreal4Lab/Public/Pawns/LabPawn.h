@@ -56,7 +56,8 @@ class UNREAL4LAB_API ALabPawn : public ACharacter,
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
-
+	//减去防御力，减去装备，技能的低档，圣神伤害等等
+	virtual float AdjustDamage(float DamageAmout, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser);
 	/**
 	* Kills pawn.
 	* @param KillingDamage - Damage amount of the killing blow
@@ -111,6 +112,10 @@ protected:
 	/** stop playing all montages */
 	void StopAllAnimMontages();
 
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = State)
+	int32 Mana;
+
 protected:
 
 	/** melee anim */
@@ -131,6 +136,9 @@ protected:
 	/*base health*/
 	UPROPERTY(EditAnywhere, Category = State)
 	int32 BaseHealth;
+
+	UPROPERTY(EditAnywhere, Category = State)
+	int32 BaseMana;
 
 	/*base attack range*/
 	UPROPERTY(EditAnywhere, Category = State)
