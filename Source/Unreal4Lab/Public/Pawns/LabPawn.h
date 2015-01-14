@@ -76,6 +76,9 @@ class UNREAL4LAB_API ALabPawn : public ACharacter,
 	UFUNCTION(NetMulticast, Unreliable)
 	virtual void BroadcastPlayAttackMontage();
 
+
+	void CastSpell(int32 index);
+
 	
 
 protected:
@@ -112,6 +115,11 @@ protected:
 	/** stop playing all montages */
 	void StopAllAnimMontages();
 
+	void BeginActiveSpell(int32 index);
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerBeginActiveSpell(int32 index);
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = State)
 	int32 Mana;
@@ -129,6 +137,9 @@ protected:
 	/*team num*/
 	UPROPERTY(EditAnywhere, Replicated,  Category = State)
 	TEnumAsByte<ELabTeam::Type> m_team_num;
+
+	UPROPERTY(EditDefaultsOnly, Category = Spell)
+	TArray<TSubclassOf<class ALabSpell>> SpellClasses;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = State)
 	int32 Health;

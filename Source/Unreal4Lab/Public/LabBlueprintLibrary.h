@@ -27,4 +27,6 @@ class ULabBlueprintLibrary : public UBlueprintFunctionLibrary
 	const FVector& SpawnLocation, const FVector& ShootDirection, TEnumAsByte<ELabTeam::Type> OwnerTeam, int32 ImpactDamage, float LifeSpan = 10.0f, class ALabPawn* InOwner = NULL);
 
 	static void printDebugInfo(FString msg);
+
+	static void printDebugInfo(bool HasAuthority, FString msg);
 };

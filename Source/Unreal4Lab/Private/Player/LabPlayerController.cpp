@@ -37,6 +37,12 @@ void ALabPlayerController::SetupInputComponent()
 
 	InputComponent->BindAxis("MoveForward", this, &ALabPlayerController::MoveForward);
 	InputComponent->BindAxis("MoveRight", this, &ALabPlayerController::MoveRight);
+
+	InputComponent->BindAction("FirstSpell", IE_Pressed, this, &ALabPlayerController::ActiveFirstSpell);
+	InputComponent->BindAction("SecondSpell", IE_Pressed, this, &ALabPlayerController::ActiveSecondSpell);
+	InputComponent->BindAction("ThirdSpell", IE_Pressed, this, &ALabPlayerController::ActiveThirdSpell);
+	InputComponent->BindAction("FourthSpell", IE_Pressed, this, &ALabPlayerController::ActiveFourthSpell);
+
 }
 
 void ALabPlayerController::MoveToMouseCursor()
@@ -138,5 +144,34 @@ void ALabPlayerController::ServerSetNewMoveDestination_Implementation(const FVec
 			Pawn->MoveToLocation(this, DestLocation);
 		}
 	}
+}
+
+void ALabPlayerController::ActiveSpell(int32 index)
+{
+	ALabPlayerProxy* Pawn = Cast<ALabPlayerProxy>(GetPawn());
+	if (Pawn)
+	{
+		Pawn->ActiveSpell(index);
+	}
+}
+
+void ALabPlayerController::ActiveFirstSpell()
+{
+	ActiveSpell(0);
+}
+
+void ALabPlayerController::ActiveSecondSpell()
+{
+	ActiveSpell(1);
+}
+
+void ALabPlayerController::ActiveThirdSpell()
+{
+	ActiveSpell(2);
+}
+
+void ALabPlayerController::ActiveFourthSpell()
+{
+	ActiveSpell(3);
 }
 

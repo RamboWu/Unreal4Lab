@@ -40,6 +40,8 @@ class UNREAL4LAB_API ALabPlayerProxy : public APawn
 	// Used by the controller to get moving to work 
 	void MoveToLocation(const class ALabPlayerController* controller, const FVector& vector);
 
+	void ActiveSpell(int32 index);
+
 protected:
 	uint32 bSetTeamNum : 1;
 	

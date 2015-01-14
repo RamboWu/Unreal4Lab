@@ -15,6 +15,13 @@ void ULabBlueprintLibrary::printDebugInfo(FString msg)
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, msg);
 }
 
+void ULabBlueprintLibrary::printDebugInfo(bool HasAuthority, FString msg)
+{
+	if (HasAuthority)
+		printDebugInfo("Server:" + msg);
+	else
+		printDebugInfo("Client:" + msg);
+}
 ALabProjectile* ULabBlueprintLibrary::SpawnProjectileFromClass(UObject* WorldContextObject, TSubclassOf<ALabProjectile> ProjectileClass,
 	const FVector& SpawnLocation, const FVector& ShootDirection, TEnumAsByte<ELabTeam::Type> OwnerTeam, int32 ImpactDamage, float LifeSpan, ALabPawn* InOwner)
 {

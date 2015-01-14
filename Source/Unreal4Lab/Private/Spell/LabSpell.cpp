@@ -2,6 +2,7 @@
 
 #include "Unreal4Lab.h"
 #include "Pawns/LabPawn.h"
+#include "LabBlueprintLibrary.h"
 #include "LabSpell.h"
 
 
@@ -9,7 +10,7 @@ ALabSpell::ALabSpell(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
 	bInCoolDown = false;
-
+	Level = -1;
 }
 
 void ALabSpell::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -17,6 +18,7 @@ void ALabSpell::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLife
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ALabSpell, OrderIndex);
 	DOREPLIFETIME(ALabSpell, Level);
+	DOREPLIFETIME(ALabSpell, PawnOwner);
 }
 
 bool ALabSpell::CanCast()
@@ -57,6 +59,7 @@ bool ALabSpell::CanCast()
 
 void ALabSpell::SendPlayerMessage(FText Msg)
 {
+	ULabBlueprintLibrary::printDebugInfo(Msg.ToString());
 // 	local UDKMOBAHeroAIController UDKMOBAHeroAIController;
 // 	local UDKMOBAHUD UDKMOBAHUD;
 // 

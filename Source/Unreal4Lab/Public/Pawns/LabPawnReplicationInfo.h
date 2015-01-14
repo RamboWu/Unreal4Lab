@@ -31,6 +31,9 @@ struct FLabPawnReplicationInfo
 	UPROPERTY(BlueprintReadOnly, Category = State)
 	int32 Damage;
 
+	UPROPERTY(BlueprintReadOnly, Category = Spell)
+	TArray<class ALabSpell*> Spells;
+
 public:
 	FLabPawnReplicationInfo()
 	{}

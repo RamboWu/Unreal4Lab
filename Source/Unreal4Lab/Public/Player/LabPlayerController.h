@@ -39,6 +39,13 @@ protected:
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerSetNewMoveDestination(const FVector DestLocation);
+
+	void ActiveSpell(int32 index);
+	void ActiveFirstSpell();
+	void ActiveSecondSpell();
+	void ActiveThirdSpell();
+	void ActiveFourthSpell();
+
 };
 
 

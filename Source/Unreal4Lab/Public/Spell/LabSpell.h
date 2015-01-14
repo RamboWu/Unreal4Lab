@@ -77,6 +77,7 @@ class UNREAL4LAB_API ALabSpell : public AActor
 	// When this spell was (last) triggered
 	//var ProtectedWrite float ActivatedAt;
 	// Pawn that currently owns this spell
+	UPROPERTY(Replicated)
 	class APawn* PawnOwner;
 	// Activation count which increases when the spell is activated. If the activation count gets reset back to zero, then it is considered to be refreshed
 	//var ProtectedWrite RepNotify int ActivationCount;

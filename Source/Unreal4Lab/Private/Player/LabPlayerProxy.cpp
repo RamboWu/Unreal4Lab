@@ -137,3 +137,11 @@ void ALabPlayerProxy::setTeamNum()
 	}
 	
 }
+
+void ALabPlayerProxy::ActiveSpell(int32 index)
+{
+	if (Character)
+	{
+		Character->CastSpell(index);
+	}
+}

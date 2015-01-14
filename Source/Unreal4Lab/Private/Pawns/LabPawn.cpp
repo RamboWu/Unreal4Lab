@@ -6,6 +6,7 @@
 #include "LabPawnReplicationInfo.h"
 #include "LabStatsModifier.h"
 #include "LabPawn.h"
+#include "LabSpell.h"
 
 
 ALabPawn::ALabPawn(const class FPostConstructInitializeProperties& PCIP)
@@ -108,6 +109,34 @@ void ALabPawn::BeginPlay()
 			//StatsModifier->AddStatChange(STATNAME_HPMax, 10, MODTYPE_Growth, 0.f, true);
 			//StatsModifier.AddStatChange(STATNAME_Agility, BaseAgility, MODTYPE_Addition, 0.f, true);
 			//StatsModifier.AddStatChange(STATNAME_Intelligence, BaseIntelligence, MODTYPE_Addition, 0.f, true);
+		}
+
+		// Give all the spells associated with the hero
+		if (SpellClasses.Num() > 0 && PawnReplicationInfo.Spells.Num() != SpellClasses.Num())
+		{
+			// Iterate through the spell archetypes
+			for (int32 i = 0; i < SpellClasses.Num(); ++i)
+			{
+				if (SpellClasses[i] != NULL)
+				{
+					ALabSpell* spell = Cast<ALabSpell>(GetWorld()->SpawnActor(SpellClasses[i]));
+					// Spawn the spell archetype
+					//Spell = Spawn(UDKMOBAPlayerReplicationInfo.HeroArchetype.SpellArchetypes[i].Class, Self, , , , UDKMOBAPlayerReplicationInfo.HeroArchetype.SpellArchetypes[i]);
+					if (spell != NULL)
+					{
+						spell->PawnOwner = this;
+						spell->OrderIndex = PawnReplicationInfo.Spells.Num();
+						spell->Level = 0;
+						// Set the spells owner replication info and spell index for replication to the client owner
+						//Spell.OwnerReplicationInfo = UDKMOBAHeroPawnReplicationInfo;
+						//Spell.OrderIndex = UDKMOBAHeroPawnReplicationInfo.Spells.Length;
+						//Spell.Initialize();
+						//Spell.ClientSetOwner(Self);
+						// Add the spell to the spells array
+						PawnReplicationInfo.Spells.Add(spell);
+					}
+				}
+			}
 		}
 	}
 		
@@ -481,4 +510,69 @@ float ALabPawn::AdjustDamage(float DamageAmout, struct FDamageEvent const& Damag
 
 	InDamage = Int(OutDamage);*/
 	return DamageAmout;
+}
+
+void ALabPawn::BeginActiveSpell(int32 index)
+{
+	ULabBlueprintLibrary::printDebugInfo(HasAuthority(), GetName() + "BeginActiveSpell" + FString::FromInt(index));
+	// Since the check for the spell is already done on both the client and the server, and this function is protected, SpellIndex is considered to be safe to use
+	PawnReplicationInfo.Spells[index]->Activate();
+}
+
+bool ALabPawn::ServerBeginActiveSpell_Validate(int32 index)
+{
+	return true;
+}
+
+/* Actual implementation of the ServerSetMoveDestination method */
+void ALabPawn::ServerBeginActiveSpell_Implementation(int32 index)
+{
+	// Clients can never run this
+	if (HasAuthority())
+	{
+		return;
+	}
+
+	if (index >= PawnReplicationInfo.Spells.Num() ||
+		PawnReplicationInfo.Spells[index] == NULL ||
+		!PawnReplicationInfo.Spells[index]->CanCast())
+	{
+		return;
+	}
+
+	// Begin activating the spell
+	BeginActiveSpell(index);
+}
+
+void ALabPawn::CastSpell(int32 index)
+{
+	if (index >= PawnReplicationInfo.Spells.Num() ||
+		PawnReplicationInfo.Spells[index] == NULL ||
+		!PawnReplicationInfo.Spells[index]->CanCast())
+	{
+		ULabBlueprintLibrary::printDebugInfo(HasAuthority(), GetName() + "BeginActiveSpell" + FString::FromInt(index) + 
+			"Failed! Spells Num=" + FString::FromInt(PawnReplicationInfo.Spells.Num()) + 
+			"CanCast =" + FString::FromInt(PawnReplicationInfo.Spells[index]->CanCast()));
+
+		return;
+	}
+
+	// If the spell does use an aiming style, then go to the player aiming spell state
+	/*if (PawnReplicationInfo.Spells[index]->AimingType != EAT_None)
+	{
+		AimingSpell = UDKMOBAHeroPawnReplicationInfo.Spells[SpellIndex];
+		GotoState('PlayerAimingSpell');
+	}
+	// Otherwise activate the spell
+	else
+	{*/
+		// If this is on the client, then sync with the server
+		if (HasAuthority())
+		{
+			ServerBeginActiveSpell(index);
+		}
+
+		// Begin casting the spell
+		BeginActiveSpell(index);
+	//}
 }
