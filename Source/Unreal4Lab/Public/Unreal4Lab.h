@@ -9,4 +9,5 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogUnreal4Lab, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogLab, Log, All);
 
+#define COLLISION_PROJECTILE	ECC_GameTraceChannel2
 #endif

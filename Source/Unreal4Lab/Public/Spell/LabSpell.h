@@ -88,6 +88,7 @@ class UNREAL4LAB_API ALabSpell : public AActor
 	*/
 	
 	bool CanCast();
+	//both server and client
 	void Activate();
 	//TODO how to set target
 	bool SetTargetsFromAim(FVector AimLocation, FVector AimDirection);
