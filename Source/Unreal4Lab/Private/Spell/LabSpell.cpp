@@ -9,6 +9,7 @@
 ALabSpell::ALabSpell(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
+	bReplicates = true;
 	bInCoolDown = false;
 	Level = -1;
 }

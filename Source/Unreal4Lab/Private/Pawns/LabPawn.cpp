@@ -551,8 +551,8 @@ void ALabPawn::CastSpell(int32 index)
 		!PawnReplicationInfo.Spells[index]->CanCast())
 	{
 		ULabBlueprintLibrary::printDebugInfo(HasAuthority(), GetName() + "BeginActiveSpell" + FString::FromInt(index) + 
-			"Failed! Spells Num=" + FString::FromInt(PawnReplicationInfo.Spells.Num()) + 
-			"CanCast =" + FString::FromInt(PawnReplicationInfo.Spells[index]->CanCast()));
+			"Failed! Spells Num=" + FString::FromInt(PawnReplicationInfo.Spells.Num()) +
+			" if Null:" + FString::FromInt(PawnReplicationInfo.Spells[index] == NULL));
 
 		return;
 	}

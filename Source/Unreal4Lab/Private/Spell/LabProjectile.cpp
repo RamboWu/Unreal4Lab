@@ -9,6 +9,10 @@ ALabProjectile::ALabProjectile(const class FPostConstructInitializeProperties& P
 	: Super(PCIP)
 	, ConstantDamage(false)
 {
+	bReplicates = true;
+	bReplicateInstigator = true;
+	bReplicateMovement = true;
+
 	bInitialized = false;
 
 	PrimaryActorTick.bCanEverTick = true;
