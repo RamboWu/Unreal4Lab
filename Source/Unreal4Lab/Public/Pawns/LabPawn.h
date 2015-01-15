@@ -53,11 +53,24 @@ class UNREAL4LAB_API ALabPawn : public ACharacter,
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Test, Category = State)
 	struct FLabPawnReplicationInfo  PawnReplicationInfo;
 
+	UPROPERTY(Replicated)
+	TArray<class ALabSpell*> SpellArray;
+
+	/** spawn spells, setup initial variables */
+	virtual void PostInitializeComponents() override;
+
 	virtual void BeginPlay() override;
+
 	virtual void Tick(float DeltaTime) override;
+
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
+
 	//减去防御力，减去装备，技能的低档，圣神伤害等等
 	virtual float AdjustDamage(float DamageAmout, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser);
+
+	/** cleanup inventory and spell */
+	virtual void Destroyed() override;
+
 	/**
 	* Kills pawn.
 	* @param KillingDamage - Damage amount of the killing blow
@@ -82,6 +95,8 @@ class UNREAL4LAB_API ALabPawn : public ACharacter,
 	
 
 protected:
+	
+
 	/** Returns True if the pawn can die in the current state */
 	virtual bool CanDie(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser) const;
 
@@ -164,7 +179,6 @@ protected:
 	UPROPERTY()
 	class ULabStatsModifier* StatsModifier;
 
-	int32 JustSpawned:1;
 
 	/**
 	* Recalculate the pawn stat
@@ -175,4 +189,9 @@ protected:
 
 	/** event called after die animation  to hide character and delete it asap */
 	//void OnDieAnimationEnd();
+
+	//if respawn, need to recover the spells and inventory
+	void SpawnSpellsAndInventory();
+
+	void DestroySpellsAndInventory();
 };

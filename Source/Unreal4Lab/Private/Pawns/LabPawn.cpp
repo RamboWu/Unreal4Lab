@@ -21,7 +21,6 @@ ALabPawn::ALabPawn(const class FPostConstructInitializeProperties& PCIP)
 	StatsModifier(NULL)
 {
 	bReplicates = true;
-	JustSpawned = true;
 	bIsDying = false;
 }
 
@@ -33,6 +32,7 @@ void ALabPawn::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifet
 	DOREPLIFETIME(ALabPawn, Mana);
 	DOREPLIFETIME(ALabPawn, PawnReplicationInfo);
 	DOREPLIFETIME(ALabPawn, LastTakeHitInfo);
+	DOREPLIFETIME(ALabPawn, SpellArray);
 }
 
 uint8 ALabPawn::GetTeamNum() const
@@ -101,44 +101,18 @@ void ALabPawn::BeginPlay()
 	//PawnReplicationInfo = ConstructObject<ULabPawnReplicationInfo>(ULabPawnReplicationInfo::StaticClass(), this);
 	
 		
-	if (HasAuthority())
-	{
-		StatsModifier = ConstructObject<ULabStatsModifier>(ULabStatsModifier::StaticClass(), this);
-		if (StatsModifier)
-		{
-			//StatsModifier->AddStatChange(STATNAME_HPMax, 10, MODTYPE_Growth, 0.f, true);
-			//StatsModifier.AddStatChange(STATNAME_Agility, BaseAgility, MODTYPE_Addition, 0.f, true);
-			//StatsModifier.AddStatChange(STATNAME_Intelligence, BaseIntelligence, MODTYPE_Addition, 0.f, true);
-		}
-
-		// Give all the spells associated with the hero
-		if (SpellClasses.Num() > 0 && PawnReplicationInfo.Spells.Num() != SpellClasses.Num())
-		{
-			// Iterate through the spell archetypes
-			for (int32 i = 0; i < SpellClasses.Num(); ++i)
-			{
-				if (SpellClasses[i] != NULL)
-				{
-					ALabSpell* spell = Cast<ALabSpell>(GetWorld()->SpawnActor(SpellClasses[i]));
-					// Spawn the spell archetype
-					//Spell = Spawn(UDKMOBAPlayerReplicationInfo.HeroArchetype.SpellArchetypes[i].Class, Self, , , , UDKMOBAPlayerReplicationInfo.HeroArchetype.SpellArchetypes[i]);
-					if (spell != NULL)
-					{
-						spell->PawnOwner = this;
-						spell->OrderIndex = PawnReplicationInfo.Spells.Num();
-						spell->Level = 0;
-						// Set the spells owner replication info and spell index for replication to the client owner
-						//Spell.OwnerReplicationInfo = UDKMOBAHeroPawnReplicationInfo;
-						//Spell.OrderIndex = UDKMOBAHeroPawnReplicationInfo.Spells.Length;
-						//Spell.Initialize();
-						//Spell.ClientSetOwner(Self);
-						// Add the spell to the spells array
-						PawnReplicationInfo.Spells.Add(spell);
-					}
-				}
-			}
-		}
-	}
+// 	if (HasAuthority())
+// 	{
+// 		StatsModifier = ConstructObject<ULabStatsModifier>(ULabStatsModifier::StaticClass(), this);
+// 		if (StatsModifier)
+// 		{
+// 			//StatsModifier->AddStatChange(STATNAME_HPMax, 10, MODTYPE_Growth, 0.f, true);
+// 			//StatsModifier.AddStatChange(STATNAME_Agility, BaseAgility, MODTYPE_Addition, 0.f, true);
+// 			//StatsModifier.AddStatChange(STATNAME_Intelligence, BaseIntelligence, MODTYPE_Addition, 0.f, true);
+// 		}
+// 
+// 		
+// 	}
 		
 }
 
@@ -164,13 +138,7 @@ void ALabPawn::RecalculateStats()
 	PawnReplicationInfo.ManaMax = StatsModifier->CalculateStat(STATNAME_ManaMax, BaseMana);
 	PawnReplicationInfo.HealthMax = StatsModifier->CalculateStat(STATNAME_HPMax, BaseHealth);
 	PawnReplicationInfo.Damage = StatsModifier->CalculateStat(STATNAME_Damage, BaseDamage);
-		// If just spawned, then set Mana  and Health to Max
 
-		if (JustSpawned)
-		{
-			JustSpawned = false;
-			Health = PawnReplicationInfo.HealthMax;
-		}
 /*	}*/
 }
 
@@ -575,4 +543,86 @@ void ALabPawn::CastSpell(int32 index)
 		// Begin casting the spell
 		BeginActiveSpell(index);
 	//}
+}
+
+void ALabPawn::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (HasAuthority())
+	{
+		//TODO if respawn, need to recover the spells and inventory
+		SpawnSpellsAndInventory();
+
+		StatsModifier = ConstructObject<ULabStatsModifier>(ULabStatsModifier::StaticClass(), this);
+		if (StatsModifier)
+		{
+			//StatsModifier->AddStatChange(STATNAME_HPMax, 10, MODTYPE_Growth, 0.f, true);
+			//StatsModifier.AddStatChange(STATNAME_Agility, BaseAgility, MODTYPE_Addition, 0.f, true);
+			//StatsModifier.AddStatChange(STATNAME_Intelligence, BaseIntelligence, MODTYPE_Addition, 0.f, true);
+		}
+		RecalculateStats();
+		// If just spawned, then set Mana  and Health to Max
+		Health = PawnReplicationInfo.HealthMax;
+	}
+
+}
+
+void ALabPawn::SpawnSpellsAndInventory()
+{
+	if (!HasAuthority())
+		return;
+
+	// Give all the spells associated with the hero
+	if (SpellClasses.Num() > 0 && PawnReplicationInfo.Spells.Num() != SpellClasses.Num())
+	{
+		// Iterate through the spell archetypes
+		for (int32 i = 0; i < SpellClasses.Num(); ++i)
+		{
+			if (SpellClasses[i] != NULL)
+			{
+				ALabSpell* spell = Cast<ALabSpell>(GetWorld()->SpawnActor(SpellClasses[i]));
+				// Spawn the spell archetype
+				//Spell = Spawn(UDKMOBAPlayerReplicationInfo.HeroArchetype.SpellArchetypes[i].Class, Self, , , , UDKMOBAPlayerReplicationInfo.HeroArchetype.SpellArchetypes[i]);
+				if (spell != NULL)
+				{
+					spell->PawnOwner = this;
+					spell->OrderIndex = PawnReplicationInfo.Spells.Num();
+					spell->Level = 0;
+					// Set the spells owner replication info and spell index for replication to the client owner
+					//Spell.OwnerReplicationInfo = UDKMOBAHeroPawnReplicationInfo;
+					//Spell.OrderIndex = UDKMOBAHeroPawnReplicationInfo.Spells.Length;
+					//Spell.Initialize();
+					//Spell.ClientSetOwner(Self);
+					// Add the spell to the spells array
+					PawnReplicationInfo.Spells.Add(spell);
+				}
+			}
+		}
+	}
+}
+
+void ALabPawn::Destroyed()
+{
+	Super::Destroyed();
+	DestroySpellsAndInventory();
+}
+
+void ALabPawn::DestroySpellsAndInventory()
+{
+	if (Role < ROLE_Authority)
+	{
+		return;
+	}
+
+	// remove all weapons from inventory and destroy them
+	for (int32 i = PawnReplicationInfo.Spells.Num() - 1; i >= 0; i--)
+	{
+		ALabSpell* Spell = PawnReplicationInfo.Spells[i];
+		if (Spell)
+		{
+			Spell->Destroy();
+			PawnReplicationInfo.Spells.RemoveSingle(Spell);
+		}
+	}
 }
